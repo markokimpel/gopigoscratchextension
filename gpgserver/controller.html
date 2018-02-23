@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>GoPiGo3 Controller</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+  <script src="jquery/jquery-3.2.1.min.js"></script>
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <script src="controller.js"></script>
+</head>
+<body>
+<div class="container">
+
+  <h1>GoPiGo3 Controller</h1>
+
+  <div class="card card-body my-sm-2">
+    <p><strong>Platform information</strong></p>
+    <form class="form-inline">
+      <button id="platformInformationSubmit" type="button" class="btn btn-primary mr-sm-3">Query</button>
+      <textarea id="platformInformationValue" rows="5" class="form-control col-6" disabled="disabled">?</textarea>
+    </form>
+  </div>
+
+  <div class="card card-body my-sm-2">
+    <p><strong>Voltages</strong></p>
+    <form>
+      <div class="form-group row">
+        <label for="platformInformationVoltages5VSubmit" class="col-sm-1 col-form-label">5V</label>
+        <button id="platformInformationVoltages5VSubmit" type="button" class="btn btn-primary mr-sm-3">Query</button>
+        <input id="platformInformationVoltages5VValue" type="text" class="form-control mr-sm-2 col-1" placeholder="?" disabled="disabled">
+        <label for="platformInformationVoltages5VValue" class="col-form-label">V</label>
+      </div>
+    </form>
+    <form>
+      <div class="form-group row">
+        <label for="platformInformationVoltagesBatterySubmit" class="col-sm-1 col-form-label">Battery</label>
+        <button id="platformInformationVoltagesBatterySubmit" type="button" class="btn btn-primary mr-sm-3">Query</button>
+        <input id="platformInformationVoltagesBatteryValue" type="text" class="form-control mr-sm-2 col-1" placeholder="?" disabled="disabled">
+        <label for="platformInformationVoltagesBatteryValue" class="col-form-label">V</label>
+      </div>
+    </form>
+  </div>
+
+  <div class="card card-body my-sm-2">
+    <p><strong>Blinkers</strong></p>
+    <form class="form-inline">
+      <label class="mr-sm-2">Turn</label>
+      <select id="blinkersId" class="form-control mr-sm-2">
+        <option selected="selected" value="both">both blinkers</option>
+        <option value="left">left blinker</option>
+        <option value="right">right blinker</option>
+      </select>
+      <select id="blinkersState" class="form-control mr-sm-2"><option selected="selected">on</option><option>off</option></select>
+      <button id="blinkersSubmit" type="button" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+
+  <div class="card card-body my-sm-2">
+    <p><strong>Switch State</strong></p>
+    <form class="form-inline">
+      <label class="mr-sm-2" for="switchNo">Switch</label>
+      <select id="switchNo" class="form-control mr-sm-2"><option selected="selected">1</option><option>2</option></select>
+      <button id="switchSubmit" type="button" class="btn btn-primary mr-sm-3">Query</button>
+      <input id="switchState" type="text" class="form-control col-1" placeholder="?" disabled="disabled">
+    </form>
+  </div>
+
+  <div class="card card-body my-sm-2">
+    <p><strong>Motor Control</strong></p>
+    <form class="form-inline">
+      <label class="mr-sm-2">Move</label>
+      <select id="moveDirection" class="form-control mr-sm-2"><option selected="selected">forward</option><option>reverse</option><option>right</option><option>left</option></select>
+      <label class="mr-sm-2" for="moveSpeed">Speed</label>
+      <input id="moveSpeed" name="moveSpeed" type="text" class="form-control mr-sm-1 col-1" value="50">
+      <label class="mr-sm-2">%</label>
+      <label class="mr-sm-2" for="moveDuration">Duration</label>
+      <input id="moveDuration" name="moveDuration" type="text" class="form-control mr-sm-1 col-1" value="1">
+      <label class="mr-sm-2">seconds</label>
+      <button id="moveSubmit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
+    </form>
+    <small>Duration <cite>0</cite> means forever.</small>
+    <form class="form-inline mt-sm-3">
+      <label class="mr-sm-2">Set Motors</label>
+      <label class="mr-sm-2" for="motorsLeftDirection">Left</label>
+      <select id="motorsLeftDirection" class="form-control mr-sm-2"><option selected="selected">forward</option><option>reverse</option></select>
+      <label class="mr-sm-2" for="motorsLeftSpeed">Speed</label>
+      <input id="motorsLeftSpeed" name="motorsLeftSpeed" type="text" class="form-control mr-sm-1 col-1" value="50">
+      <label class="mr-sm-2">%</label>
+      <label class="mr-sm-2" for="motorsRightDirection">Right</label>
+      <select id="motorsRightDirection" class="form-control mr-sm-2"><option selected="selected">forward</option><option>reverse</option></select>
+      <label class="mr-sm-2" for="motorsRightSpeed">Speed</label>
+      <input id="motorsRightSpeed" name="motorsRightSpeed" type="text" class="form-control mr-sm-1 col-1" value="50">
+      <label class="mr-sm-2">%</label>
+      <button id="motorsSubmit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
+    </form>
+    <form class="form-inline mt-sm-3">
+      <label class="mr-sm-2" for="stopSubmit">Stop Motors</label>
+      <button id="stopSubmit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
+    </form>
+  </div>
+
+  <div class="card card-body my-sm-2">
+    <p><strong>Sonar</strong></p>
+    <form class="form-inline">
+      <label class="mr-sm-2" for="distanceSubmit">Distance</label>
+      <button id="distanceSubmit" type="button" class="btn btn-primary mr-sm-2">Query</button>
+      <input id="distanceValue" type="text" class="form-control mr-sm-3 col-1" placeholder="?" disabled="disabled">
+      <label for="distanceValue">cm</label>
+    </form>
+  </div>
+
+  <a href="..">Homepage</a>
+
+</div>
+</body>
+</html>
