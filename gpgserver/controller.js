@@ -67,6 +67,26 @@ $(document).ready(function() {
     });
   });
 
+  $("#eyesSubmit").click(function() {
+    var url = "/v1/eyes";
+    if ($("#eyesId").val() != "both") {
+      url = url + "/" + encodeURIComponent($("#eyesId").val());
+    }
+    $.ajax({
+      method: "PUT",
+      url: url,
+      data: JSON.stringify({
+        red: $("#eyesRed").val(),
+        blue: $("#eyesBlue").val(),
+        green: $("#eyesGreen").val()
+      }),
+      contentType: "application/json; charset=UTF-8",
+      error: function(jqXHR, textStatus, errorThrown) {
+        alert("Error: " + errorThrown);
+      }
+    });
+  });
+
   $("#switchSubmit").click(function() {
     $("#switchState").val("?");
     $.ajax({

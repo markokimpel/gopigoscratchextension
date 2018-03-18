@@ -20,7 +20,7 @@
 #
 # User pages:
 #     /                 homepage
-#     /controller.html  UI to manually control RRB3
+#     /controller.html  UI to manually control GoPiGo3
 #
 # Scratch extension:
 #     /scratch_extension.js
@@ -104,6 +104,7 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
             content_type = MimeTypes().guess_type(fname)[0]
             if content_type is not None:
                 self.send_header('Content-Type', content_type + "; charset=UTF-8")
+            # TODO: send Content-Length header
             self.end_headers()
 
             # send content to requester
@@ -125,6 +126,7 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
             content_type = MimeTypes().guess_type(fname)[0]
             if content_type is not None:
                 self.send_header('Content-Type', content_type)
+            # TODO: send Content-Length header
             self.end_headers()
 
             # send content to requester
@@ -211,7 +213,7 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
             # Class EasyGoPiGo3 offers no method to change both blinkers with a
             # single SPI transfer. Using GoPiGo3.set_led directly.
 
-            # Map to GoPiGo3.set_led parameters
+            # map to GoPiGo3.set_led parameters
             led = {
                 '': gpg3.LED_LEFT_BLINKER | gpg3.LED_RIGHT_BLINKER,
                 'left': gpg3.LED_LEFT_BLINKER,
@@ -224,6 +226,62 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
                 }[state]
 
             gpg3.set_led(led, brightness)
+
+            self.send_response(204)
+            self.end_headers()
+
+        elif self.path.startswith('/v1/eyes'):
+
+            # read and parse PUT data
+            data_bytes = self.rfile.read(int(self.headers['Content-Length']))
+            data_string = data_bytes.decode()
+            data = json.loads(data_string)
+
+            # eyes_id from URL
+            eyes_id = urllib.parse.unquote(self.path[9:])
+            if eyes_id not in {'', 'left', 'right'}:
+                self.send_error(400, "Unknown eyes_id " + blinkers_id)
+                return
+
+            # color from PUT data
+
+            if not self.is_convertible_to_int(data['red']):
+                self.send_error(400, "Parameter red not an int ({})".format(data['red']))
+                return
+            red = int(data['red'])
+            if red < 0 or red > 255:
+                self.send_error(400, "Parameter red not in range 0..255 ({})".format(red))
+                return
+
+            if not self.is_convertible_to_int(data['green']):
+                self.send_error(400, "Parameter green not an int ({})".format(data['green']))
+                return
+            green = int(data['green'])
+            if green < 0 or green > 255:
+                self.send_error(400, "Parameter green not in range 0..255 ({})".format(green))
+                return
+
+            if not self.is_convertible_to_int(data['blue']):
+                self.send_error(400, "Parameter blue not an int ({})".format(data['blue']))
+                return
+            blue = int(data['blue'])
+            if blue < 0 or blue > 255:
+                self.send_error(400, "Parameter blue not in range 0..255 ({})".format(blue))
+                return
+
+            # Class EasyGoPiGo3 offers some eye open/close semantic that is
+            # rather confusing than helpful. Also, the class does not provide
+            # a method to change both eyes with a single SPI transfer. Using
+            # GoPiGo3.set_led directly.
+
+            # map to GoPiGo3.set_led parameters
+            led = {
+                '': gpg3.LED_LEFT_EYE | gpg3.LED_RIGHT_EYE,
+                'left': gpg3.LED_LEFT_EYE,
+                'right': gpg3.LED_RIGHT_EYE
+                }[eyes_id]
+
+            gpg3.set_led(led, red, green, blue)
 
             self.send_response(204)
             self.end_headers()
@@ -346,6 +404,13 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
         # TODO: write Content-Length
         self.end_headers()
         self.wfile.write(data_string.encode())
+
+    def is_convertible_to_int(self, s):
+        try:
+            int(s)
+            return True
+        except ValueError:
+            return False
 
     def is_convertible_to_float(self, s):
         try:
