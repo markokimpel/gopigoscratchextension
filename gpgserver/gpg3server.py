@@ -30,18 +30,24 @@
 #          { "server": "gpg3", "v1": "supported" }
 #     GET  /v1/ping
 #          { "server": "gpg3" }
+#
 #     GET  /v1/platform/information
-#          { "manufacturer": "Dexter Industries", "board_name": "GoPiGo3",
-#            "hardware_version": "3.x.x", "firmware_version": "1.0.0",
+#          { "manufacturer": "Dexter Industries",
+#            "board_name": "GoPiGo3",
+#            "hardware_version": "3.x.x",
+#            "firmware_version": "1.0.0",
 #            "hardware_serial_number": "0123456789ABCDEF0123456789ABCDEF" }
 #     GET  /v1/platform/voltages/5v
 #          { "voltage": 4.931 }
 #     GET  /v1/platform/voltages/battery
 #          { "voltage": 9.434 }
-#     PUT  /blinkers[/left|right] { "state": "on"|"off" }
-#     PUT  /eyes[/left|right] { "red": 255, "green": 0, "blue": 0 }
+#
+#     PUT  /v1/blinkers[/left|right] { "state": "on"|"off" }
+#     PUT  /v1/eyes[/left|right] { "red": 255, "green": 0, "blue": 0 }
+#
+#     GET  /v1/sensors/I2C/distance/distance
+#          { "distance": 523 }
 
-#     POST /v1/led/[led_no] { "state": "on"|"off" }
 #     GET  /v1/switch/[switch_no]
 #          { "state": "open" | "closed" }
 #     POST /v1/move { "direction": "forward"|"reverse"|"right"|"left", "speed": [pct], "duration": [secs] }
@@ -179,12 +185,12 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
 #            data = {'state' : state_string}
 #            self.send_json_response(data)
 #
-#        elif self.path == '/v1/distance':
-#
-#            distance = rrb3.get_distance()
-#
-#            data = {'distance' : distance}
-#            self.send_json_response(data)
+        elif self.path == '/v1/sensors/I2C/distance/distance':
+
+            dist = distance_sensor.read_mm()
+
+            data = {'distance' : dist}
+            self.send_json_response(data)
 
         else:
             self.send_error(404, "Unknown path " + self.path)
@@ -228,6 +234,8 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
             gpg3.set_led(led, brightness)
 
             self.send_response(204)
+            if self.headers.get('Origin') is not None:
+                self.send_header("Access-Control-Allow-Origin", self.headers.get('Origin'))
             self.end_headers()
 
         elif self.path.startswith('/v1/eyes'):
@@ -284,6 +292,8 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
             gpg3.set_led(led, red, green, blue)
 
             self.send_response(204)
+            if self.headers.get('Origin') is not None:
+                self.send_header("Access-Control-Allow-Origin", self.headers.get('Origin'))
             self.end_headers()
 
             """
@@ -388,7 +398,7 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
 
         self.send_header("Access-Control-Allow-Origin", self.headers.getheader('Origin'))
-        self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, PUT, POST, OPTIONS")
 
         if self.headers.getheader('Access-Control-Request-Headers') is not None:
             self.send_header("Access-Control-Allow-Headers", self.headers.getheader('Access-Control-Request-Headers'))
@@ -452,9 +462,11 @@ if __name__ == "__main__":
 
     gpg3 = EasyGoPiGo3(use_mutex=True)
 
+    distance_sensor = gpg3.init_distance_sensor()
+
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
-        gpg3.stop()
+        gpg3.reset_all()

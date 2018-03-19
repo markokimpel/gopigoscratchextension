@@ -145,14 +145,14 @@ $(document).ready(function() {
     });
   });
 
-  $("#distanceSubmit").click(function() {
-    $("#distanceValue").val("?");
+  $("#sensorsDistanceSubmit").click(function() {
+    $("#sensorsDistanceValue").val("?");
     $.ajax({
       method: "GET",
-      url: "/v1/distance",
+      url: "/v1/sensors/I2C/distance/distance",
       dataType: "json",
       success: function(data) {
-        $("#distanceValue").val(data.distance);
+        $("#sensorsDistanceValue").val(data.distance);
       },
       error: function(jqXHR, textStatus, errorThrown) {
         alert("Error: " + errorThrown);
