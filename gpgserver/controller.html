@@ -66,66 +66,74 @@
         <option value="right">right eye</option>
       </select>
       <label class="mr-sm-2">to</label>
-      <label class="mr-sm-2" for="eyesRed">Red</label>
-      <input id="eyesRed" name="eyesRed" type="text" class="form-control mr-sm-2 col-1" value="255">
-      <label class="mr-sm-2" for="eyesGreen">Green</label>
-      <input id="eyesGreen" name="eyesGreen" type="text" class="form-control mr-sm-2 col-1" value="0">
-      <label class="mr-sm-2" for="eyesBlue">Blue</label>
-      <input id="eyesBlue" name="eyesBlue" type="text" class="form-control mr-sm-2 col-1" value="0">
+      <label for="eyesRed" class="mr-sm-2">Red</label>
+      <input id="eyesRed" type="text" class="form-control mr-sm-2 col-1" value="255">
+      <label for="eyesGreen" class="mr-sm-2">Green</label>
+      <input id="eyesGreen" type="text" class="form-control mr-sm-2 col-1" value="0">
+      <label for="eyesBlue" class="mr-sm-2">Blue</label>
+      <input id="eyesBlue" type="text" class="form-control mr-sm-2 col-1" value="0">
       <button id="eyesSubmit" type="button" class="btn btn-primary">Submit</button>
     </form>
   </div>
 
   <div class="card card-body my-sm-2">
-    <p><strong>Switch State</strong></p>
+    <p><strong>Motors</strong></p>
     <form class="form-inline">
-      <label class="mr-sm-2" for="switchNo">Switch</label>
-      <select id="switchNo" class="form-control mr-sm-2"><option selected="selected">1</option><option>2</option></select>
-      <button id="switchSubmit" type="button" class="btn btn-primary mr-sm-3">Query</button>
-      <input id="switchState" type="text" class="form-control col-1" placeholder="?" disabled="disabled">
+      <label class="mr-sm-2">Drive</label>
+      <select id="motorsDriveDirection" class="form-control mr-sm-2"><option selected="selected">forward</option><option>backward</option></select>
+      <label for="motorsDriveSpeed" class="mr-sm-2">Speed</label>
+      <input id="motorsDriveSpeed" type="text" class="form-control mr-sm-1 col-1" value="50">
+      <label class="mr-sm-2">%</label>
+      <label for="motorsDriveDistance" class="mr-sm-2">Distance</label>
+      <input id="motorsDriveDistance" type="text" class="form-control mr-sm-1 col-1" value="100">
+      <label class="mr-sm-2">mm</label>
+      <button id="motorsDriveSubmit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
     </form>
-  </div>
-
-  <div class="card card-body my-sm-2">
-    <p><strong>Motor Control</strong></p>
-    <form class="form-inline">
+    <small>No distance means forever.</small>
+    <form class="form-inline mt-sm-3">
+      <label class="mr-sm-2">Turn</label>
+      <select id="motorsTurnDirection" class="form-control mr-sm-2"><option selected="selected">left</option><option>right</option></select>
+      <label for="motorsTurnSpeed" class="mr-sm-2">Speed</label>
+      <input id="motorsTurnSpeed" type="text" class="form-control mr-sm-1 col-1" value="50">
+      <label class="mr-sm-2">%</label>
+      <label for="motorsTurnDegrees" class="mr-sm-2">Degrees</label>
+      <input id="motorsTurnDegrees" type="text" class="form-control mr-sm-1 col-1" value="90">
+      <label class="mr-sm-2">°</label>
+      <button id="motorsTurnSubmit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
+    </form>
+    <small>No degrees means forever.</small>
+    <form class="form-inline mt-sm-3">
       <label class="mr-sm-2">Move</label>
-      <select id="moveDirection" class="form-control mr-sm-2"><option selected="selected">forward</option><option>reverse</option><option>right</option><option>left</option></select>
-      <label class="mr-sm-2" for="moveSpeed">Speed</label>
-      <input id="moveSpeed" name="moveSpeed" type="text" class="form-control mr-sm-1 col-1" value="50">
+      <label for="motorsMoveLeftDirection" class="mr-sm-2">Left</label>
+      <select id="motorsMoveLeftDirection" class="form-control mr-sm-2"><option selected="selected">forward</option><option>reverse</option></select>
+      <label for="motorsMoveLeftSpeed" class="mr-sm-2">Speed</label>
+      <input id="motorsMoveLeftSpeed" type="text" class="form-control mr-sm-1 col-1" value="50">
       <label class="mr-sm-2">%</label>
-      <label class="mr-sm-2" for="moveDuration">Duration</label>
-      <input id="moveDuration" name="moveDuration" type="text" class="form-control mr-sm-1 col-1" value="1">
-      <label class="mr-sm-2">seconds</label>
-      <button id="moveSubmit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
-    </form>
-    <small>Duration <cite>0</cite> means forever.</small>
-    <form class="form-inline mt-sm-3">
-      <label class="mr-sm-2">Set Motors</label>
-      <label class="mr-sm-2" for="motorsLeftDirection">Left</label>
-      <select id="motorsLeftDirection" class="form-control mr-sm-2"><option selected="selected">forward</option><option>reverse</option></select>
-      <label class="mr-sm-2" for="motorsLeftSpeed">Speed</label>
-      <input id="motorsLeftSpeed" name="motorsLeftSpeed" type="text" class="form-control mr-sm-1 col-1" value="50">
+      <label for="motorsMoveRightDirection" class="mr-sm-2">Right</label>
+      <select id="motorsMoveRightDirection" class="form-control mr-sm-2"><option selected="selected">forward</option><option>reverse</option></select>
+      <label for="motorsMoveRightSpeed" class="mr-sm-2">Speed</label>
+      <input id="motorsMoveRightSpeed" type="text" class="form-control mr-sm-1 col-1" value="50">
       <label class="mr-sm-2">%</label>
-      <label class="mr-sm-2" for="motorsRightDirection">Right</label>
-      <select id="motorsRightDirection" class="form-control mr-sm-2"><option selected="selected">forward</option><option>reverse</option></select>
-      <label class="mr-sm-2" for="motorsRightSpeed">Speed</label>
-      <input id="motorsRightSpeed" name="motorsRightSpeed" type="text" class="form-control mr-sm-1 col-1" value="50">
-      <label class="mr-sm-2">%</label>
-      <button id="motorsSubmit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
+      <button id="motorsMoveSubmit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
     </form>
     <form class="form-inline mt-sm-3">
-      <label class="mr-sm-2" for="stopSubmit">Stop Motors</label>
-      <button id="stopSubmit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
+      <label for="motorsStopSubmit" class="mr-sm-2">Stop Motors</label>
+      <button id="motorsStopSubmit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
     </form>
+    <form class="form-inline mt-sm-3">
+      <label for="motorsStatusSubmit" class="mr-sm-2">Status</label>
+      <button id="motorsStatusSubmit" type="button" class="btn btn-primary mr-sm-2">Query</button>
+      <button id="motorsStatusClear" type="button" class="btn btn-secondary mr-sm-3">Clear</button>
+    </form>
+    <textarea id="motorStatusValue" rows="5" class="mt-sm-1" style="font-family:monospace;" disabled="disabled"></textarea>
   </div>
 
   <div class="card card-body my-sm-2">
     <p><strong>Distance sensor</strong></p>
     <form class="form-inline">
-      <label class="mr-sm-2" for="sensorsDistanceSubmit">Distance</label>
+      <label for="sensorsDistanceSubmit" class="mr-sm-2">Distance</label>
       <button id="sensorsDistanceSubmit" type="button" class="btn btn-primary mr-sm-2">Query</button>
-      <input id="sensorsDistanceValue" type="text" class="form-control mr-sm-3 col-1" placeholder="?" disabled="disabled">
+      <input id="sensorsDistanceValue" type="text" class="form-control mr-sm-2 col-1" placeholder="?" disabled="disabled">
       <label for="sensorsDistanceValue">mm</label>
     </form>
   </div>

@@ -43,18 +43,18 @@
 #          { "voltage": 9.434 }
 #
 #     PUT  /v1/blinkers[/left|right] { "state": "on"|"off" }
-#     PUT  /v1/eyes[/left|right] { "red": 255, "green": 0, "blue": 0 }
+#     PUT  /v1/eyes[/left|right] { "red": 255, "green": 0, "blue": 0 } (range 0..255)
+#
+#     POST /v1/motors/drive { "direction": "forward"|"backward", "speed": [pct] [, "distance": [mm]] }
+#     POST /v1/motors/turn { "direction": right"|"left", "speed": [pct] [, "degrees": [degrees]] }
+#     POST /v1/motors/move { left_direction: "forward"|"backward", "left_speed": [pct], "right_direction"="forward"|"backward", "right_speed": [pct] }
+#     POST /v1/motors/stop
+#     GET  /v1/motors/status
+#          { left:  { "flags": 0, "power": 52, "encoder": 5270, "dps": 175 },
+#            right: { "flags": 0, "power": 54, "encoder": 5624, "dps": 174 } }
 #
 #     GET  /v1/sensors/I2C/distance/distance
-#          { "distance": 523 }
-
-#     GET  /v1/switch/[switch_no]
-#          { "state": "open" | "closed" }
-#     POST /v1/move { "direction": "forward"|"reverse"|"right"|"left", "speed": [pct], "duration": [secs] }
-#     POST /v1/motors { left_direction: "forward"|"reverse", "left_speed": [pct], "right_direction"="forward"|"reverse", "right_speed": [pct] }
-#     POST /v1/stop
-#     GET  /v1/distance
-#          { "distance": [dist] }
+#          { "distance": 523 } (in mm)
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
@@ -164,32 +164,35 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
             data = {'voltage': gpg3.get_voltage_battery()}
             self.send_json_response(data)
 
-#        elif self.path.startswith('/v1/switch/'):
-#
-#            # switch_no from URL
-#            switch_no = urllib.unquote(self.path[11:])
-#            if switch_no not in {'1', '2'}:
-#                self.send_error(400, "Unknown switch_no " + switch_no)
-#                return
-#
-#            if switch_no == '1':
-#                state = rrb3.sw1_closed()
-#            else:
-#                state = rrb3.sw2_closed()
-#
-#            if state == 1:
-#                state_string = 'closed'
-#            else:
-#                state_string = 'open'
-#
-#            data = {'state' : state_string}
-#            self.send_json_response(data)
-#
         elif self.path == '/v1/sensors/I2C/distance/distance':
 
             dist = distance_sensor.read_mm()
 
             data = {'distance' : dist}
+            self.send_json_response(data)
+
+        elif self.path == '/v1/motors/status':
+
+            (left_flags, left_power, left_encoder, left_dps) = \
+                gpg3.get_motor_status(gpg3.MOTOR_LEFT)
+            (right_flags, right_power, right_encoder, right_dps) = \
+                gpg3.get_motor_status(gpg3.MOTOR_RIGHT)
+
+            data = {
+                'left': {
+                    'flags': left_flags,
+                    'power': left_power,
+                    'encoder': left_encoder,
+                    'dps': left_dps
+                    },
+                'right': {
+                    'flags': right_flags,
+                    'power': right_power,
+                    'encoder': right_encoder,
+                    'dps': right_dps
+                    }
+                }
+
             self.send_json_response(data)
 
         else:

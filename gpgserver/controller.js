@@ -87,14 +87,83 @@ $(document).ready(function() {
     });
   });
 
-  $("#switchSubmit").click(function() {
-    $("#switchState").val("?");
+  $("#motorsDriveSubmit").click(function() {
+    $.ajax({
+      method: "POST",
+      url: "/v1/motors/drive",
+      data: JSON.stringify({
+        direction: $("#motorsDriveDirection").val(),
+        speed: $("#motorsDriveSpeed").val(),
+        distance: $("#motorsDriveDistance").val()
+      }),
+      contentType: "application/json; charset=UTF-8",
+      error: function(jqXHR, textStatus, errorThrown) {
+        alert("Error: " + errorThrown);
+      }
+    });
+  });
+
+  $("#motorsTurnSubmit").click(function() {
+    $.ajax({
+      method: "POST",
+      url: "/v1/motors/turn",
+      data: JSON.stringify({
+        direction: $("#motorsTurnDirection").val(),
+        speed: $("#motorsTurnSpeed").val(),
+        degrees: $("#motorsTurnDegrees").val()
+      }),
+      contentType: "application/json; charset=UTF-8",
+      error: function(jqXHR, textStatus, errorThrown) {
+        alert("Error: " + errorThrown);
+      }
+    });
+  });
+
+  $("#motorsMoveSubmit").click(function() {
+    $.ajax({
+      method: "POST",
+      url: "/v1/motors/move",
+      data: JSON.stringify({
+        left_direction: $("#motorsMoveLeftDirection").val(),
+        left_speed: $("#motorsMoveLeftSpeed").val(),
+        right_direction: $("#motorsMoveRightDirection").val(),
+        right_speed: $("#motorsMoveRightSpeed").val(),
+      }),
+      contentType: "application/json; charset=UTF-8",
+      error: function(jqXHR, textStatus, errorThrown) {
+        alert("Error: " + errorThrown);
+      }
+    });
+  });
+
+  $("#motorsStopSubmit").click(function() {
+    $.ajax({
+      method: "POST",
+      url: "/v1/motors/stop",
+      error: function(jqXHR, textStatus, errorThrown) {
+        alert("Error: " + errorThrown);
+      }
+    });
+  });
+
+  $("#motorsStatusSubmit").click(function() {
     $.ajax({
       method: "GET",
-      url: "/v1/switch/" + encodeURIComponent($("#switchNo").val()),
+      url: "/v1/motors/status",
       dataType: "json",
       success: function(data) {
-        $("#switchState").val(data.state);
+        $("#motorStatusValue").val(
+          $("#motorStatusValue").val() + "\n" +
+          data.left.flags.toString().padStart(5) + " " +
+          data.left.power.toString().padStart(5) + " " +
+          data.left.encoder.toString().padStart(7) + " " +
+          data.left.dps.toString().padStart(4) + " | " +
+          data.right.flags.toString().padStart(5) + " " +
+          data.right.power.toString().padStart(5) + " " +
+          data.right.encoder.toString().padStart(7) + " " +
+          data.right.dps.toString().padStart(4)
+          );
+          $('#motorStatusValue').scrollTop($('#motorStatusValue')[0].scrollHeight);
       },
       error: function(jqXHR, textStatus, errorThrown) {
         alert("Error: " + errorThrown);
@@ -102,48 +171,14 @@ $(document).ready(function() {
     });
   });
 
-  $("#moveSubmit").click(function() {
-    $.ajax({
-      method: "POST",
-      url: "/v1/move",
-      data: JSON.stringify({
-        direction: $("#moveDirection").val(),
-        speed: $("#moveSpeed").val(),
-        duration: $("#moveDuration").val()
-      }),
-      contentType: "application/json; charset=UTF-8",
-      error: function(jqXHR, textStatus, errorThrown) {
-        alert("Error: " + errorThrown);
-      }
-    });
+  var motorStatusValueHeader = "Flags Power Encoder  dps | Flags Power Encoder  dps"
+
+  $("#motorsStatusClear").click(function() {
+    $("#motorStatusValue").val(motorStatusValueHeader);
   });
 
-  $("#motorsSubmit").click(function() {
-    $.ajax({
-      method: "POST",
-      url: "/v1/motors",
-      data: JSON.stringify({
-        left_direction: $("#motorsLeftDirection").val(),
-        left_speed: $("#motorsLeftSpeed").val(),
-        right_direction: $("#motorsRightDirection").val(),
-        right_speed: $("#motorsRightSpeed").val(),
-      }),
-      contentType: "application/json; charset=UTF-8",
-      error: function(jqXHR, textStatus, errorThrown) {
-        alert("Error: " + errorThrown);
-      }
-    });
-  });
-
-  $("#stopSubmit").click(function() {
-    $.ajax({
-      method: "POST",
-      url: "/v1/stop",
-      error: function(jqXHR, textStatus, errorThrown) {
-        alert("Error: " + errorThrown);
-      }
-    });
-  });
+  // initial header
+  $("#motorStatusValue").val(motorStatusValueHeader);
 
   $("#sensorsDistanceSubmit").click(function() {
     $("#sensorsDistanceValue").val("?");
