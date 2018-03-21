@@ -202,10 +202,7 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
 
         if self.path.startswith('/v1/blinkers'):
 
-            # read and parse PUT data
-            data_bytes = self.rfile.read(int(self.headers['Content-Length']))
-            data_string = data_bytes.decode()
-            data = json.loads(data_string)
+            data = self.receive_json_request()
 
             # blinkers_id from URL
             blinkers_id = urllib.parse.unquote(self.path[13:])
@@ -236,17 +233,11 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
 
             gpg3.set_led(led, brightness)
 
-            self.send_response(204)
-            if self.headers.get('Origin') is not None:
-                self.send_header("Access-Control-Allow-Origin", self.headers.get('Origin'))
-            self.end_headers()
+            self.send_no_content_response()
 
         elif self.path.startswith('/v1/eyes'):
 
-            # read and parse PUT data
-            data_bytes = self.rfile.read(int(self.headers['Content-Length']))
-            data_string = data_bytes.decode()
-            data = json.loads(data_string)
+            data = self.receive_json_request()
 
             # eyes_id from URL
             eyes_id = urllib.parse.unquote(self.path[9:])
@@ -294,99 +285,191 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
 
             gpg3.set_led(led, red, green, blue)
 
-            self.send_response(204)
-            if self.headers.get('Origin') is not None:
-                self.send_header("Access-Control-Allow-Origin", self.headers.get('Origin'))
-            self.end_headers()
+            self.send_no_content_response()
 
-            """
-            elif self.path == '/v1/move':
+        else:
+            self.send_error(404, "Unknown path " + self.path)
 
-                # read and parse POST data
-                data_string = self.rfile.read(int(self.headers['Content-Length']))
-                data = json.loads(data_string)
+    def do_POST(self):
 
-                # direction from POST data
-                direction = data['direction']
-                if direction not in {'forward','reverse','right','left'}:
-                    self.send_error(400, "Unknown direction " + direction)
+        if self.path == '/v1/motors/drive':
+
+            data = self.receive_json_request()
+
+            direction = data['direction']
+            if direction not in {'forward', 'backward'}:
+                self.send_error(400, "Unknown direction " + direction)
+                return
+
+            if not self.is_convertible_to_int(data['speed']):
+                self.send_error(400, "Parameter speed not a int ({})".format(data['speed']))
+                return
+            speed = int(data['speed'])
+            if speed < 0 or speed > 100:
+                self.send_error(400, "Parameter speed not in range 0..100 ({})".format(speed))
+                return
+
+            distance = None
+            if 'distance' in data:
+                if not self.is_convertible_to_int(data['distance']):
+                    self.send_error(400, "Parameter distance not an int ({})".format(data['distance']))
+                    return
+                distance = int(data['distance'])
+                if distance < 0:
+                    self.send_error(400, "Parameter distance less than 0 ({})".format(distance))
                     return
 
-                if not self.is_convertible_to_float(data['speed']):
-                    self.send_error(400, "Parameter speed not a float (%s)" % data['speed'])
-                    return
-                speed = float(data['speed'])
-                if speed < 0 or speed > 100:
-                    self.send_error(400, "Parameter speed not in range 0..100 (%f)" % speed)
-                    return
+            # Set Speed
+            #
+            # Speed in dps is a percentage of the 'default speed' which reflects
+            # a reasonable maximum).
+            #
+            # Method EasyGoPiGo3.set_speed() calls GoPiGo3.set_motor_limits(),
+            # and EasyGoPiGo3.forward() calls GoPiGo3.set_motor_dps(). Even
+            # though the speed is also passed to set_motor_dps,
+            # set_motor_limits needs to be called to remove any limits a
+            # previous operation may have set.
+            dps = int(gpg3.DEFAULT_SPEED * speed / 100)
+            gpg3.set_speed(dps)
 
-                if not self.is_convertible_to_float(data['duration']):
-                    self.send_error(400, "Parameter duration not a float (%s)" % data['duration'])
-                    return
-                duration = float(data['duration'])
-                if duration < 0:
-                    self.send_error(400, "Parameter duration less than 0 (%f)" % duration)
-                    return
-
+            if distance is None:
+                # drive forever
                 if direction == 'forward':
-                    rrb3.forward(duration, speed / 100)
-                elif direction == 'reverse':
-                    rrb3.reverse(duration, speed / 100)
-                elif direction == 'right':
-                    rrb3.right(duration, speed / 100)
+                    gpg3.forward()
                 else:
-                    rrb3.left(duration, speed / 100)
+                    gpg3.backward()
+            else:
+                # drive given distance
+                dist_cm = distance / 10
+                if direction == 'backward':
+                    dist_cm = -dist_cm
+                gpg3.drive_cm(dist_cm, blocking=True)
 
-                self.send_json_response({})
+            self.send_no_content_response()
 
-            elif self.path == '/v1/motors':
+        elif self.path == '/v1/motors/turn':
 
-                # read and parse POST data
-                data_string = self.rfile.read(int(self.headers['Content-Length']))
-                data = json.loads(data_string)
+            data = self.receive_json_request()
 
-                if data['left_direction'] == 'forward':
-                    left_direction = 0
-                elif data['left_direction'] == 'reverse':
-                    left_direction = 1
+            direction = data['direction']
+            if direction not in {'right', 'left'}:
+                self.send_error(400, "Unknown direction " + direction)
+                return
+
+            if not self.is_convertible_to_int(data['speed']):
+                self.send_error(400, "Parameter speed not a int ({})".format(data['speed']))
+                return
+            speed = int(data['speed'])
+            if speed < 0 or speed > 100:
+                self.send_error(400, "Parameter speed not in range 0..100 ({})".format(speed))
+                return
+
+            degrees = None
+            if 'degrees' in data:
+                if not self.is_convertible_to_int(data['degrees']):
+                    self.send_error(400, "Parameter degrees not an int ({})".format(data['degrees']))
+                    return
+                degrees = int(data['degrees'])
+                if degrees < 0:
+                    self.send_error(400, "Parameter degrees less than 0 ({})".format(degrees))
+                    return
+
+            # Set Speed
+            #
+            # Speed in dps is a percentage of the 'default speed' which reflects
+            # a reasonable maximum).
+            #
+            # Method EasyGoPiGo3.set_speed() calls GoPiGo3.set_motor_limits().
+            # Even though the speed is also passed to set_motor_dps,
+            # set_motor_limits needs to be called to remove any limits a
+            # previous operation may have set.
+            dps = int(gpg3.DEFAULT_SPEED * speed / 100)
+            gpg3.set_speed(dps)
+
+            if degrees is None:
+                # turn forever
+                if direction == 'right':
+                    gpg3.set_motor_dps(gpg3.MOTOR_LEFT, dps)
+                    gpg3.set_motor_dps(gpg3.MOTOR_RIGHT, -dps)
                 else:
-                    self.send_error(400, "Unknown left_direction " + data['left_direction'])
-                    return
-
-                if not self.is_convertible_to_float(data['left_speed']):
-                    self.send_error(400, "Parameter left_speed not a float (%s)" % data['left_speed'])
-                    return
-                left_speed = float(data['left_speed'])
-                if left_speed < 0 or left_speed > 100:
-                    self.send_error(400, "Parameter left_speed not in range 0..100 (%f)" % left_speed)
-                    return
-
-                if data['right_direction'] == 'forward':
-                    right_direction = 0
-                elif data['right_direction'] == 'reverse':
-                    right_direction = 1
+                    gpg3.set_motor_dps(gpg3.MOTOR_LEFT, -dps)
+                    gpg3.set_motor_dps(gpg3.MOTOR_RIGHT, dps)
+            else:
+                # turn given degrees
+                if direction == 'right':
+                    gpg3.turn_degrees(degrees, blocking=True)
                 else:
-                    self.send_error(400, "Unknown right_direction " + data['right_direction'])
-                    return
+                    gpg3.turn_degrees(-degrees, blocking=True)
 
-                if not self.is_convertible_to_float(data['right_speed']):
-                    self.send_error(400, "Parameter right_speed not a float (%s)" % data['right_speed'])
-                    return
-                right_speed = float(data['right_speed'])
-                if right_speed < 0 or right_speed > 100:
-                    self.send_error(400, "Parameter right_speed not in range 0..100 (%f)" % right_speed)
-                    return
+            self.send_no_content_response()
 
-                rrb3.set_motors(right_speed / 100, right_direction, left_speed / 100, left_direction)
+        elif self.path == '/v1/motors/move':
 
-                self.send_json_response({})
+            data = self.receive_json_request()
 
-            elif self.path == '/v1/stop':
+            left_direction = data['left_direction']
+            if left_direction not in {'forward', 'backward'}:
+                self.send_error(400, "Unknown left_direction " + left_direction)
+                return
 
-                rrb3.stop()
+            if not self.is_convertible_to_int(data['left_speed']):
+                self.send_error(400, "Parameter left_speed not a int ({})".format(data['left_speed']))
+                return
+            left_speed = int(data['left_speed'])
+            if left_speed < 0 or left_speed > 100:
+                self.send_error(400, "Parameter left_speed not in range 0..100 ({})".format(left_speed))
+                return
 
-                self.send_json_response({})
-            """
+            right_direction = data['right_direction']
+            if right_direction not in {'forward', 'backward'}:
+                self.send_error(400, "Unknown right_direction " + right_direction)
+                return
+
+            if not self.is_convertible_to_int(data['right_speed']):
+                self.send_error(400, "Parameter right_speed not a int ({})".format(data['right_speed']))
+                return
+            right_speed = int(data['right_speed'])
+            if right_speed < 0 or right_speed > 100:
+                self.send_error(400, "Parameter right_speed not in range 0..100 ({})".format(right_speed))
+                return
+
+            if (left_direction == right_direction and
+                left_speed == right_speed):
+
+                # similar logic as in /v1/motors/drive
+
+                dps = int(gpg3.DEFAULT_SPEED * left_speed / 100)
+                gpg3.set_speed(dps)
+
+                if left_direction == 'forward':
+                    gpg3.forward()
+                else:
+                    gpg3.backward()
+
+            else:
+
+                # Remove any potential limits from previous operation.
+                gpg3.reset_speed()
+
+                left_dps = int(gpg3.DEFAULT_SPEED * left_speed / 100)
+                if (left_direction == 'backward'):
+                    left_dps = -left_dps
+
+                right_dps = int(gpg3.DEFAULT_SPEED * right_speed / 100)
+                if (right_direction == 'backward'):
+                    right_dps = -right_dps
+
+                gpg3.set_motor_dps(gpg3.MOTOR_LEFT, left_dps)
+                gpg3.set_motor_dps(gpg3.MOTOR_RIGHT, right_dps)
+
+            self.send_no_content_response()
+
+        elif self.path == '/v1/motors/stop':
+
+            gpg3.stop()
+
+            self.send_no_content_response()
+
         else:
             self.send_error(404, "Unknown path " + self.path)
 
@@ -408,6 +491,16 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
 
         self.end_headers()
 
+    # Read request body and parse as JSON.
+    # Typically used by PUT and POST operations.
+    def receive_json_request(self):
+        # read and parse request data
+        data_bytes = self.rfile.read(int(self.headers['Content-Length']))
+        data_string = data_bytes.decode()
+        return json.loads(data_string)
+
+    # Send 200 success response with JSON as body.
+    # Typically used for GET operations.
     def send_json_response(self, data):
         data_string = json.dumps(data)
         self.send_response(200)
@@ -418,16 +511,17 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data_string.encode())
 
+    # Send 204 no content response.
+    # Typically used for PUT and POST operations.
+    def send_no_content_response(self):
+        self.send_response(204)
+        if self.headers.get('Origin') is not None:
+            self.send_header("Access-Control-Allow-Origin", self.headers.get('Origin'))
+        self.end_headers()
+
     def is_convertible_to_int(self, s):
         try:
             int(s)
-            return True
-        except ValueError:
-            return False
-
-    def is_convertible_to_float(self, s):
-        try:
-            float(s)
             return True
         except ValueError:
             return False

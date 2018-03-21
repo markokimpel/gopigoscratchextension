@@ -1,3 +1,24 @@
+/* https://github.com/markokimpel/gopigoscratchextension
+ *
+ * Controller UI
+ *
+ * Send commands to GoPiGo3 Server from a webpage.
+ *
+ * Copyright 2018 Marko Kimpel
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 $(document).ready(function() {
 
   $("#platformInformationSubmit").click(function() {
@@ -88,14 +109,17 @@ $(document).ready(function() {
   });
 
   $("#motorsDriveSubmit").click(function() {
+    data = {
+      direction: $("#motorsDriveDirection").val(),
+      speed: $("#motorsDriveSpeed").val()
+    }
+    if ($("#motorsDriveDistance").val() != "") {
+      data.distance = $("#motorsDriveDistance").val();
+    }
     $.ajax({
       method: "POST",
       url: "/v1/motors/drive",
-      data: JSON.stringify({
-        direction: $("#motorsDriveDirection").val(),
-        speed: $("#motorsDriveSpeed").val(),
-        distance: $("#motorsDriveDistance").val()
-      }),
+      data: JSON.stringify(data),
       contentType: "application/json; charset=UTF-8",
       error: function(jqXHR, textStatus, errorThrown) {
         alert("Error: " + errorThrown);
@@ -104,14 +128,17 @@ $(document).ready(function() {
   });
 
   $("#motorsTurnSubmit").click(function() {
+    data = {
+      direction: $("#motorsTurnDirection").val(),
+      speed: $("#motorsTurnSpeed").val()
+    }
+    if ($("#motorsTurnDegrees").val() != "") {
+      data.degrees = $("#motorsTurnDegrees").val();
+    }
     $.ajax({
       method: "POST",
       url: "/v1/motors/turn",
-      data: JSON.stringify({
-        direction: $("#motorsTurnDirection").val(),
-        speed: $("#motorsTurnSpeed").val(),
-        degrees: $("#motorsTurnDegrees").val()
-      }),
+      data: JSON.stringify(data),
       contentType: "application/json; charset=UTF-8",
       error: function(jqXHR, textStatus, errorThrown) {
         alert("Error: " + errorThrown);
