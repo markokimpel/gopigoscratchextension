@@ -132,8 +132,8 @@ $(document).ready(function() {
       direction: $("#motorsTurnDirection").val(),
       speed: $("#motorsTurnSpeed").val()
     }
-    if ($("#motorsTurnDegrees").val() != "") {
-      data.degrees = $("#motorsTurnDegrees").val();
+    if ($("#motorsTurnAngle").val() != "") {
+      data.angle = $("#motorsTurnAngle").val();
     }
     $.ajax({
       method: "POST",
@@ -190,7 +190,7 @@ $(document).ready(function() {
           data.right.encoder.toString().padStart(7) + " " +
           data.right.dps.toString().padStart(4)
           );
-          $('#motorStatusValue').scrollTop($('#motorStatusValue')[0].scrollHeight);
+          $("#motorStatusValue").scrollTop($("#motorStatusValue")[0].scrollHeight);
       },
       error: function(jqXHR, textStatus, errorThrown) {
         alert("Error: " + errorThrown);
@@ -206,6 +206,30 @@ $(document).ready(function() {
 
   // initial header
   $("#motorStatusValue").val(motorStatusValueHeader);
+
+  $("#servosServo1Submit").click(function() {
+    $.ajax({
+      method: "PUT",
+      url: "/v1/servos/SERVO1/position",
+      data: JSON.stringify({position: $("#servosServo1Position").val()}),
+      contentType: "application/json; charset=UTF-8",
+      error: function(jqXHR, textStatus, errorThrown) {
+        alert("Error: " + errorThrown);
+      }
+    });
+  });
+
+  $("#servosServo2Submit").click(function() {
+    $.ajax({
+      method: "PUT",
+      url: "/v1/servos/SERVO2/position",
+      data: JSON.stringify({position: $("#servosServo2Position").val()}),
+      contentType: "application/json; charset=UTF-8",
+      error: function(jqXHR, textStatus, errorThrown) {
+        alert("Error: " + errorThrown);
+      }
+    });
+  });
 
   $("#sensorsDistanceSubmit").click(function() {
     $("#sensorsDistanceValue").val("?");

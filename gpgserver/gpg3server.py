@@ -46,12 +46,14 @@
 #     PUT  /v1/eyes[/left|right] { "red": 255, "green": 0, "blue": 0 } (range 0..255)
 #
 #     POST /v1/motors/drive { "direction": "forward"|"backward", "speed": [pct] [, "distance": [mm]] }
-#     POST /v1/motors/turn { "direction": right"|"left", "speed": [pct] [, "degrees": [degrees]] }
+#     POST /v1/motors/turn { "direction": right"|"left", "speed": [pct] [, "angle": [deg]] }
 #     POST /v1/motors/move { left_direction: "forward"|"backward", "left_speed": [pct], "right_direction"="forward"|"backward", "right_speed": [pct] }
 #     POST /v1/motors/stop
 #     GET  /v1/motors/status
 #          { left:  { "flags": 0, "power": 52, "encoder": 5270, "dps": 175 },
 #            right: { "flags": 0, "power": 54, "encoder": 5624, "dps": 174 } }
+#
+#     PUT  /v1/servos/SERVO1|SERVO2/position { "position": 90 } (range 0..180)
 #
 #     GET  /v1/sensors/I2C/distance/distance
 #          { "distance": 523 } (in mm)
@@ -64,7 +66,7 @@ import urllib.parse
 
 from easygopigo3 import EasyGoPiGo3
 
-class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
+class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
 
     # whitelist of allowed paths
     ALLOWED_TEXT_DOWNLOADS = {
@@ -148,23 +150,27 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
 
         elif self.path == '/v1/platform/information':
             data = {
-                'manufacturer': gpg3.get_manufacturer(),
-                'board_name': gpg3.get_board(),
-                'hardware_version': gpg3.get_version_hardware(),
-                'firmware_version': gpg3.get_version_firmware(),
-                'hardware_serial_number': gpg3.get_id()
+                'manufacturer': egpg3.get_manufacturer(),
+                'board_name': egpg3.get_board(),
+                'hardware_version': egpg3.get_version_hardware(),
+                'firmware_version': egpg3.get_version_firmware(),
+                'hardware_serial_number': egpg3.get_id()
                 }
             self.send_json_response(data)
 
         elif self.path == '/v1/platform/voltages/5v':
-            data = {'voltage': gpg3.get_voltage_5v()}
+            data = {'voltage': egpg3.get_voltage_5v()}
             self.send_json_response(data)
 
         elif self.path == '/v1/platform/voltages/battery':
-            data = {'voltage': gpg3.get_voltage_battery()}
+            data = {'voltage': egpg3.get_voltage_battery()}
             self.send_json_response(data)
 
         elif self.path == '/v1/sensors/I2C/distance/distance':
+
+            if distance_sensor is None:
+                self.send_error(404, "No distance sensor")
+                return
 
             dist = distance_sensor.read_mm()
 
@@ -174,9 +180,9 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
         elif self.path == '/v1/motors/status':
 
             (left_flags, left_power, left_encoder, left_dps) = \
-                gpg3.get_motor_status(gpg3.MOTOR_LEFT)
+                egpg3.get_motor_status(egpg3.MOTOR_LEFT)
             (right_flags, right_power, right_encoder, right_dps) = \
-                gpg3.get_motor_status(gpg3.MOTOR_RIGHT)
+                egpg3.get_motor_status(egpg3.MOTOR_RIGHT)
 
             data = {
                 'left': {
@@ -221,9 +227,9 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
 
             # map to GoPiGo3.set_led parameters
             led = {
-                '': gpg3.LED_LEFT_BLINKER | gpg3.LED_RIGHT_BLINKER,
-                'left': gpg3.LED_LEFT_BLINKER,
-                'right': gpg3.LED_RIGHT_BLINKER
+                '': egpg3.LED_LEFT_BLINKER | egpg3.LED_RIGHT_BLINKER,
+                'left': egpg3.LED_LEFT_BLINKER,
+                'right': egpg3.LED_RIGHT_BLINKER
                 }[blinkers_id]
 
             brightness = {
@@ -231,7 +237,7 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
                 'off': 0
                 }[state]
 
-            gpg3.set_led(led, brightness)
+            egpg3.set_led(led, brightness)
 
             self.send_no_content_response()
 
@@ -278,12 +284,34 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
 
             # map to GoPiGo3.set_led parameters
             led = {
-                '': gpg3.LED_LEFT_EYE | gpg3.LED_RIGHT_EYE,
-                'left': gpg3.LED_LEFT_EYE,
-                'right': gpg3.LED_RIGHT_EYE
+                '': egpg3.LED_LEFT_EYE | egpg3.LED_RIGHT_EYE,
+                'left': egpg3.LED_LEFT_EYE,
+                'right': egpg3.LED_RIGHT_EYE
                 }[eyes_id]
 
-            gpg3.set_led(led, red, green, blue)
+            egpg3.set_led(led, red, green, blue)
+
+            self.send_no_content_response()
+
+        elif self.path in ('/v1/servos/SERVO1/position', '/v1/servos/SERVO2/position'):
+
+            port = self.path[11:17]
+
+            if servos[port] is None:
+                self.send_error(404, "No servo " + port)
+                return
+
+            data = self.receive_json_request()
+
+            if not self.is_convertible_to_int(data['position']):
+                self.send_error(400, "Parameter position not an int ({})".format(data['position']))
+                return
+            position = int(data['position'])
+            if position < 0 or position > 180:
+                self.send_error(400, "Parameter position not in range 0..180 ({})".format(position))
+                return
+
+            servos[port].rotate_servo(position)
 
             self.send_no_content_response()
 
@@ -329,21 +357,21 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
             # though the speed is also passed to set_motor_dps,
             # set_motor_limits needs to be called to remove any limits a
             # previous operation may have set.
-            dps = int(gpg3.DEFAULT_SPEED * speed / 100)
-            gpg3.set_speed(dps)
+            dps = int(egpg3.DEFAULT_SPEED * speed / 100)
+            egpg3.set_speed(dps)
 
             if distance is None:
                 # drive forever
                 if direction == 'forward':
-                    gpg3.forward()
+                    egpg3.forward()
                 else:
-                    gpg3.backward()
+                    egpg3.backward()
             else:
                 # drive given distance
                 dist_cm = distance / 10
                 if direction == 'backward':
                     dist_cm = -dist_cm
-                gpg3.drive_cm(dist_cm, blocking=True)
+                egpg3.drive_cm(dist_cm, blocking=True)
 
             self.send_no_content_response()
 
@@ -364,14 +392,14 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
                 self.send_error(400, "Parameter speed not in range 0..100 ({})".format(speed))
                 return
 
-            degrees = None
-            if 'degrees' in data:
-                if not self.is_convertible_to_int(data['degrees']):
-                    self.send_error(400, "Parameter degrees not an int ({})".format(data['degrees']))
+            angle = None
+            if 'angle' in data:
+                if not self.is_convertible_to_int(data['angle']):
+                    self.send_error(400, "Parameter angle not an int ({})".format(data['angle']))
                     return
-                degrees = int(data['degrees'])
-                if degrees < 0:
-                    self.send_error(400, "Parameter degrees less than 0 ({})".format(degrees))
+                angle = int(data['angle'])
+                if angle < 0:
+                    self.send_error(400, "Parameter angle less than 0 ({})".format(angle))
                     return
 
             # Set Speed
@@ -383,23 +411,23 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
             # Even though the speed is also passed to set_motor_dps,
             # set_motor_limits needs to be called to remove any limits a
             # previous operation may have set.
-            dps = int(gpg3.DEFAULT_SPEED * speed / 100)
-            gpg3.set_speed(dps)
+            dps = int(egpg3.DEFAULT_SPEED * speed / 100)
+            egpg3.set_speed(dps)
 
-            if degrees is None:
+            if angle is None:
                 # turn forever
                 if direction == 'right':
-                    gpg3.set_motor_dps(gpg3.MOTOR_LEFT, dps)
-                    gpg3.set_motor_dps(gpg3.MOTOR_RIGHT, -dps)
+                    egpg3.set_motor_dps(egpg3.MOTOR_LEFT, dps)
+                    egpg3.set_motor_dps(egpg3.MOTOR_RIGHT, -dps)
                 else:
-                    gpg3.set_motor_dps(gpg3.MOTOR_LEFT, -dps)
-                    gpg3.set_motor_dps(gpg3.MOTOR_RIGHT, dps)
+                    egpg3.set_motor_dps(egpg3.MOTOR_LEFT, -dps)
+                    egpg3.set_motor_dps(egpg3.MOTOR_RIGHT, dps)
             else:
                 # turn given degrees
                 if direction == 'right':
-                    gpg3.turn_degrees(degrees, blocking=True)
+                    egpg3.turn_degrees(angle, blocking=True)
                 else:
-                    gpg3.turn_degrees(-degrees, blocking=True)
+                    egpg3.turn_degrees(-angle, blocking=True)
 
             self.send_no_content_response()
 
@@ -438,35 +466,35 @@ class GPG3HTTPRequestHandler(BaseHTTPRequestHandler):
 
                 # similar logic as in /v1/motors/drive
 
-                dps = int(gpg3.DEFAULT_SPEED * left_speed / 100)
-                gpg3.set_speed(dps)
+                dps = int(egpg3.DEFAULT_SPEED * left_speed / 100)
+                egpg3.set_speed(dps)
 
                 if left_direction == 'forward':
-                    gpg3.forward()
+                    egpg3.forward()
                 else:
-                    gpg3.backward()
+                    egpg3.backward()
 
             else:
 
                 # Remove any potential limits from previous operation.
-                gpg3.reset_speed()
+                egpg3.reset_speed()
 
-                left_dps = int(gpg3.DEFAULT_SPEED * left_speed / 100)
+                left_dps = int(egpg3.DEFAULT_SPEED * left_speed / 100)
                 if (left_direction == 'backward'):
                     left_dps = -left_dps
 
-                right_dps = int(gpg3.DEFAULT_SPEED * right_speed / 100)
+                right_dps = int(egpg3.DEFAULT_SPEED * right_speed / 100)
                 if (right_direction == 'backward'):
                     right_dps = -right_dps
 
-                gpg3.set_motor_dps(gpg3.MOTOR_LEFT, left_dps)
-                gpg3.set_motor_dps(gpg3.MOTOR_RIGHT, right_dps)
+                egpg3.set_motor_dps(egpg3.MOTOR_LEFT, left_dps)
+                egpg3.set_motor_dps(egpg3.MOTOR_RIGHT, right_dps)
 
             self.send_no_content_response()
 
         elif self.path == '/v1/motors/stop':
 
-            gpg3.stop()
+            egpg3.stop()
 
             self.send_no_content_response()
 
@@ -544,7 +572,7 @@ if __name__ == "__main__":
 
     # TODO: make port configurable
     server_address = ('', 8080)
-    httpd = HTTPServer(server_address, GPG3HTTPRequestHandler)
+    httpd = HTTPServer(server_address, GPG3ServerHTTPRequestHandler)
 
     # should always print IP address '0.0.0.0' which means listing at all IPs
     print("Server listening at " + httpd.server_address[0] + ":" + str(httpd.server_address[1]))
@@ -557,13 +585,25 @@ if __name__ == "__main__":
 
     print("Press Ctrl-C to stop server")
 
-    gpg3 = EasyGoPiGo3(use_mutex=True)
+    egpg3 = EasyGoPiGo3(use_mutex=True)
 
-    distance_sensor = gpg3.init_distance_sensor()
+    # TODO: Make configurable what hardware is connected.
+
+    servos = {
+        'SERVO1': egpg3.init_servo(port = "SERVO1"),
+        'SERVO2': None
+    }
+
+    # move servos in middle position
+    for port in servos:
+        if servos[port] is not None:
+            servos[port].reset_servo()
+
+    distance_sensor = egpg3.init_distance_sensor()
 
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
-        gpg3.reset_all()
+        egpg3.reset_all()

@@ -96,8 +96,8 @@
       <label for="motorsTurnSpeed" class="mr-sm-2">Speed</label>
       <input id="motorsTurnSpeed" type="text" class="form-control mr-sm-1 col-1" value="30">
       <label class="mr-sm-2">%</label>
-      <label for="motorsTurnDegrees" class="mr-sm-2">Degrees</label>
-      <input id="motorsTurnDegrees" type="text" class="form-control mr-sm-1 col-1" value="90">
+      <label for="motorsTurnAngle" class="mr-sm-2">Angle</label>
+      <input id="motorsTurnAngle" type="text" class="form-control mr-sm-1 col-1" value="90">
       <label class="mr-sm-2">°</label>
       <button id="motorsTurnSubmit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
     </form>
@@ -125,7 +125,25 @@
       <button id="motorsStatusSubmit" type="button" class="btn btn-primary mr-sm-2">Query</button>
       <button id="motorsStatusClear" type="button" class="btn btn-secondary mr-sm-3">Clear</button>
     </form>
-    <textarea id="motorStatusValue" rows="5" class="mt-sm-1" style="font-family:monospace;" disabled="disabled"></textarea>
+    <textarea id="motorStatusValue" rows="5" class="mt-sm-2" style="font-family:monospace;" disabled="disabled"></textarea>
+  </div>
+
+  <div class="card card-body my-sm-2">
+    <p><strong>Servos</strong></p>
+    <form class="form-inline">
+      <label class="mr-sm-2">SERVO1</label>
+      <label for="servosServo1Position" class="mr-sm-2">Position</label>
+      <input id="servosServo1Position" type="text" class="form-control mr-sm-1 col-1" value="90">
+      <label class="mr-sm-2">°</label>
+      <button id="servosServo1Submit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
+    </form>
+    <form class="form-inline mt-sm-3">
+      <label class="mr-sm-2">SERVO2</label>
+      <label for="servosServo2Position" class="mr-sm-2">Position</label>
+      <input id="servosServo2Position" type="text" class="form-control mr-sm-1 col-1" value="90">
+      <label class="mr-sm-2">°</label>
+      <button id="servosServo2Submit" type="button" class="btn btn-primary mr-sm-2">Submit</button>
+    </form>
   </div>
 
   <div class="card card-body my-sm-2">
