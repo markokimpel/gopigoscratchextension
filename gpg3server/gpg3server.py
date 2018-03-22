@@ -47,7 +47,7 @@
 #
 #     POST /v1/motors/drive { "direction": "forward"|"backward", "speed": [pct] [, "distance": [mm]] }
 #     POST /v1/motors/turn { "direction": right"|"left", "speed": [pct] [, "angle": [deg]] }
-#     POST /v1/motors/move { left_direction: "forward"|"backward", "left_speed": [pct], "right_direction"="forward"|"backward", "right_speed": [pct] }
+#     POST /v1/motors/set { left_direction: "forward"|"backward", "left_speed": [pct], "right_direction"="forward"|"backward", "right_speed": [pct] }
 #     POST /v1/motors/stop
 #     GET  /v1/motors/status
 #          { left:  { "flags": 0, "power": 52, "encoder": 5270, "dps": 175 },
@@ -430,7 +430,7 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
 
             self.send_no_content_response()
 
-        elif self.path == '/v1/motors/move':
+        elif self.path == '/v1/motors/set':
 
             data = self.receive_json_request()
 
@@ -504,17 +504,17 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
 
         # needed for CORS pre-flight requests
 
-        if self.headers.getheader('Origin') is None:
+        if self.headers.get('Origin') is None:
             self.send_error(501, "Non-CORS OPTIONS request not implemented")
             return
 
         self.send_response(200)
 
-        self.send_header("Access-Control-Allow-Origin", self.headers.getheader('Origin'))
+        self.send_header("Access-Control-Allow-Origin", self.headers.get('Origin'))
         self.send_header("Access-Control-Allow-Methods", "GET, PUT, POST, OPTIONS")
 
-        if self.headers.getheader('Access-Control-Request-Headers') is not None:
-            self.send_header("Access-Control-Allow-Headers", self.headers.getheader('Access-Control-Request-Headers'))
+        if self.headers.get('Access-Control-Request-Headers') is not None:
+            self.send_header("Access-Control-Allow-Headers", self.headers.get('Access-Control-Request-Headers'))
 
         self.end_headers()
 

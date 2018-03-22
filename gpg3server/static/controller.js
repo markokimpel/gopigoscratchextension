@@ -146,15 +146,15 @@ $(document).ready(function() {
     });
   });
 
-  $("#motorsMoveSubmit").click(function() {
+  $("#motorsSetSubmit").click(function() {
     $.ajax({
       method: "POST",
-      url: "/v1/motors/move",
+      url: "/v1/motors/set",
       data: JSON.stringify({
-        left_direction: $("#motorsMoveLeftDirection").val(),
-        left_speed: $("#motorsMoveLeftSpeed").val(),
-        right_direction: $("#motorsMoveRightDirection").val(),
-        right_speed: $("#motorsMoveRightSpeed").val(),
+        left_direction: $("#motorsSetLeftDirection").val(),
+        left_speed: $("#motorsSetLeftSpeed").val(),
+        right_direction: $("#motorsSetRightDirection").val(),
+        right_speed: $("#motorsSetRightSpeed").val(),
       }),
       contentType: "application/json; charset=UTF-8",
       error: function(jqXHR, textStatus, errorThrown) {
