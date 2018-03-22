@@ -89,10 +89,10 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
         # text file download with placeholder support
         if self.path in self.ALLOWED_TEXT_DOWNLOADS:
 
-            # strip off leading '/'
-            fname = self.path[1:]
-            if fname == "":
-                fname = "index.html"
+            if self.path == "/":
+                fname = "static/index.html"
+            else:
+                fname = "static" + self.path
 
             # read file
             with open(fname, "r") as f:
@@ -121,8 +121,7 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
         # binary file download
         elif self.path in self.ALLOWED_BINARY_DOWNLOADS:
 
-            # strip off leading '/'
-            fname = self.path[1:]
+            fname = "static" + self.path
 
             # read file
             with open(fname, "rb") as f:
