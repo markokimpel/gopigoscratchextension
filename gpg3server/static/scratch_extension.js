@@ -119,7 +119,7 @@
     });
   };
 
-  ext.turnContinously = function(direction, speed, callback) {
+  ext.turnContiniously = function(direction, speed, callback) {
     $.ajax({
       method: "POST",
       url: baseUrl + "/v1/motors/turn",

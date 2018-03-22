@@ -62,6 +62,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from mimetypes import MimeTypes
 import socket
+import time
 import urllib.parse
 
 from easygopigo3 import EasyGoPiGo3
@@ -311,6 +312,12 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
                 return
 
             servos[port].rotate_servo(position)
+
+            # wait for servo to reach its position
+            #
+            # The specified timespan almost is arbitrary as servo speed and
+            # previous position determine the time to reach the new position.
+            time.sleep(0.25)
 
             self.send_no_content_response()
 
