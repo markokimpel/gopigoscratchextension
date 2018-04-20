@@ -62,10 +62,14 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 from mimetypes import MimeTypes
 import socket
+from socketserver import ThreadingMixIn
 import time
 import urllib.parse
 
 from easygopigo3 import EasyGoPiGo3
+
+class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+    pass
 
 class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
 
@@ -355,7 +359,7 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
 
             # Set Speed
             #
-            # Speed in dps is a percentage of the 'default speed' which reflects
+            # Speed in dps is a percentage of the 'default speed' (which reflects
             # a reasonable maximum).
             #
             # Method EasyGoPiGo3.set_speed() calls GoPiGo3.set_motor_limits(),
@@ -410,7 +414,7 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
 
             # Set Speed
             #
-            # Speed in dps is a percentage of the 'default speed' which reflects
+            # Speed in dps is a percentage of the 'default speed' (which reflects
             # a reasonable maximum).
             #
             # Method EasyGoPiGo3.set_speed() calls GoPiGo3.set_motor_limits().
@@ -576,40 +580,50 @@ def get_own_ip():
 
 if __name__ == "__main__":
 
-    # TODO: make port configurable
-    server_address = ('', 8080)
-    httpd = HTTPServer(server_address, GPG3ServerHTTPRequestHandler)
-
-    # should always print IP address '0.0.0.0' which means listing at all IPs
-    print("Server listening at " + httpd.server_address[0] + ":" + str(httpd.server_address[1]))
-    print("")
-
-    own_ip = get_own_ip()
-    print("GPG3 Server homepage : http://" + own_ip + ":" + str(httpd.server_address[1]) + "/")
-    print("Scratch extension URL: http://" + own_ip + ":" + str(httpd.server_address[1]) + "/scratch_extension.js")
-    print("")
-
-    print("Press Ctrl-C to stop server")
+    # initialize GPG3 objects
 
     egpg3 = EasyGoPiGo3(use_mutex=True)
-
-    # TODO: Make configurable what hardware is connected.
-
-    servos = {
-        'SERVO1': egpg3.init_servo(port = "SERVO1"),
-        'SERVO2': None
-    }
-
-    # move servos in middle position
-    for port in servos:
-        if servos[port] is not None:
-            servos[port].reset_servo()
-
-    distance_sensor = egpg3.init_distance_sensor()
-
     try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        pass
+        # TODO: Make configurable what hardware is connected.
+
+        servos = {
+            'SERVO1': egpg3.init_servo(port = "SERVO1"),
+            'SERVO2': None
+        }
+
+        # move servos in middle position
+        for port in servos:
+            if servos[port] is not None:
+                servos[port].reset_servo()
+
+        distance_sensor = egpg3.init_distance_sensor()
+
+        # start HTTP server
+
+        # TODO: make port configurable
+        server_address = ('', 8080)
+        httpd = ThreadingHTTPServer(server_address, GPG3ServerHTTPRequestHandler)
+
+        # 'with' does not work with HTTPServer, so using try-finally to close the socket.
+        try:
+            # should always print IP address '0.0.0.0' which means listening at all IPs
+            print("Server listening at " + httpd.server_address[0] + ":" + str(httpd.server_address[1]))
+            print("")
+
+            own_ip = get_own_ip()
+            print("GPG3 Server homepage : http://" + own_ip + ":" + str(httpd.server_address[1]) + "/")
+            print("Scratch extension URL: http://" + own_ip + ":" + str(httpd.server_address[1]) + "/scratch_extension.js")
+            print("")
+
+            print("Press Ctrl-C to stop server")
+
+            try:
+                httpd.serve_forever()
+            except KeyboardInterrupt:
+                pass
+
+        finally:
+            httpd.server_close()
+
     finally:
         egpg3.reset_all()
