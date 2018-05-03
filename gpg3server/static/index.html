@@ -13,27 +13,33 @@
 
   <div class="jumbotron">
     <h1>GoPiGo3 Server</h1>
-      HTTP interface to the Python API of the <cite><a href="https://www.dexterindustries.com/gopigo3/" target="_blank">GoPiGo3</a></cite>.
+    Provides an HTTP interface to the Python API of the <cite><a href="https://www.dexterindustries.com/gopigo3/" target="_blank">GoPiGo3</a></cite>.
   </div>
 
-  <h2><a href="controller.html">Controller UI</a></h2>
   <p>
-    Send commands to GoPiGo3 Server from a webpage. Good for troubleshooting.
+    The GoPiGo3 Server is part of the <a href="https://github.com/markokimpel/gopigoscratchextension">GoPiGo Scratch Extension</a>.
+  </p>
+
+  <h2>Controller</h2>
+  <p>
+    Use the <a href="controller.html">Controller UI</a> to send requests to the
+    GoPiGo3 Server from a webpage. Good for troubleshooting.
   </p>
 
   <h2>Scratch integration</h2>
   <p>
     The GoPiGo3 can be controlled with Scratch by installing an extension in
-    Scratch. The extension will connect to the GoPiGo3 server. Scratch and the GoPiGo3
-    Server can be running on different computers. The installation procedures
-    for different versions of Scratch are detailed below.
+    Scratch. The extension will connect to the GoPiGo3 server. Scratch and the
+    GoPiGo3 Server may be running on different computers. The installation
+    procedures for different versions of Scratch are detailed below.
   </p>
 
   <h3>ScratchX online</h3>
   <p>
     Use the ScratchX website <a href="http://scratchx.org/#scratch">http://scratchx.org/#scratch</a>.
-    The ScratchX editor is a Flash application running in your browser. The GoPiGo3
-    Server needs to be reachable from the computer the browser is running on.
+    The ScratchX editor is a Flash application running in your browser. The
+    GoPiGo3 Server needs to be reachable from the computer the browser is
+    running on.
   </p>
   <p>
     <ul>
@@ -47,7 +53,8 @@
   </p>
   <p>
     After loading a saved project the blocks from the extension will be shown in
-    red (with label <cite>undefined</cite>). Repeat the steps above to load the extension.
+    red (with label <cite>undefined</cite>). Repeat the steps above to load the
+    extension.
   </p>
 
   <h3>Scratch 2 Offline Editor</h3>
@@ -73,15 +80,16 @@
     the <cite>sbx</cite> file, and <cite>Load Project</cite> load the same
     content from the <cite>sb2</cite> file.
     <pre>
-    pi@sr2:~/Scratch $ ln -s myproject.sbx myproject.sb2
-    i@sr2:~/Scratch $ ls -l
+    $ ln -s myproject.sbx myproject.sb2
+    $ ls -l
     rwxrwxrwx 1 pi pi    10 Feb 22 14:33 myproject.sb2 -> myproject.sbx
     rw------- 1 pi pi 55429 Feb 22 13:50 myproject.sbx
-    i@sr2:~/Scratch $</pre>
+    $</pre>
   </p>
   <p>
     After loading a saved project the blocks from the extension will be shown in
-    red (with label <cite>undefined</cite>). Repeat the steps above to load the extension.
+    red (with label <cite>undefined</cite>). Repeat the steps above to load the
+    extension.
   </p>
 
   <h3>Unsupported versions</h3>
