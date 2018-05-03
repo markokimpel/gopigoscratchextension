@@ -4,11 +4,34 @@ Control the Raspberry Pi expansion board *[GoPiGo3](https://www.dexterindustries
 
 The GoPiGo3 is made by [Dexter Industries](https://www.dexterindustries.com/). Scratch was developed by the MIT Media Lab.
 
+## Features
+
+The following GoPiGo3 or Raspberry Pi features are supported by the Scratch extension:
+
+* Motor controls
+  * drive forward/backward specific distance at specific speed and then stop
+  * drive forward/backward at specific speed until another motor command is sent
+  * turn given degrees to the left/right at specific speed and then stop
+  * turn to the left/right at specific speed until another motor command is sent
+  * set speed and direction for left and right motor individually and maintain until another motor command is sent
+  * stop motors
+* Servo control
+  * set position (0..180 degrees) for servos connected to Servo 1 or Servo 2 connector
+* Distance sensor
+  * read distance in cm
+* Blinkers (two red LED lights at the front of the GoPiGo3 board)
+  * turn on/off individually or both at the same time
+* Eyes (two RGB LED lights on top of GoPiGo3 board)
+  * control individually or both eyes at the same time
+  * set color and brightness by specification of RGB components
+
 ## Compatibility
 
 Tested with
 * *Raspberry Pi 3 Model B*
 * *GoPiGo3*
+* *Servo*
+* *Distance Sensor*
 * *Rasbian Stretch with Desktop* Version *April 2018* with latest updates as of 03-May-2018
 * *Python libraries for GoPiGo3* as of 03-May-2018
 * *ScratchX* as of 03-May-2018
@@ -36,9 +59,15 @@ The *Serial Peripheral Interface* (SPI) bus is used for communication between Ra
 
 Per default the SPI and I2C interface are disabled in Raspbian. To enable the interfaces go to menu *Preferences* > *Raspberry Pi Configuration*, tab *Interfaces*. Make sure the interfaces *SPI* and *I2C* are enabled.
 
-### Python libraries for GoPiGo3
+### Python libraries for GoPiGo3 and sensors
 
-See https://github.com/simonmonk/raspirobotboard3 for details.
+See https://github.com/DexterInd/GoPiGo3 for details.
+
+```
+$ sudo sh -c "curl -kL dexterindustries.com/update_gopigo3 | bash"
+```
+
+Install DI_sensors (https://github.com/DexterInd/DI_Sensors)
 
 ```
 $ cd ~
