@@ -8,6 +8,11 @@ The GoPiGo3 is made by [Dexter Industries](https://www.dexterindustries.com/). S
 
 The following GoPiGo3 or Raspberry Pi features are supported by the Scratch extension:
 
+* Blinkers (two red LED lights at the front of the GoPiGo3 board)
+  * turn on/off individually or both at the same time
+* Eyes (two RGB LED lights on top of GoPiGo3 board)
+  * control individually or both eyes at the same time
+  * set color and brightness by specification of RGB components
 * GoPiGo3 motion control
   * drive forward/backward specific distance at specific speed and then stop
   * drive forward/backward at specific speed until another motor command is sent
@@ -19,13 +24,6 @@ The following GoPiGo3 or Raspberry Pi features are supported by the Scratch exte
   * set position (0..180 degrees) for servo motors connected to Servo 1 or Servo 2 connectors
 * Distance sensor
   * read distance in cm
-* Blinkers (two red LED lights at the front of the GoPiGo3 board)
-  * turn on/off individually or both at the same time
-* Eyes (two RGB LED lights on top of GoPiGo3 board)
-  * control individually or both eyes at the same time
-  * set color and brightness by specification of RGB components
-
-![Scratch Blocks](images/scratch_blocks.png)
 
 ## Compatibility
 
@@ -50,10 +48,11 @@ This extension comes with a server that needs to run on the Raspberry Pi that ha
 Download and install the latest [Rasbian](https://www.raspberrypi.org/downloads/raspbian/).
 
 Update Rasbian with
- ```
- $ sudo apt update
- $ sudo apt upgrade
- ```
+
+```
+pi@student-robot:~ $ sudo apt update
+pi@student-robot:~ $ sudo apt upgrade
+```
 
 ### Enable SPI and I2C interfaces
 
@@ -102,7 +101,7 @@ Press Ctrl-C to stop server
 
 Open the GoPiGo3 Server homepage with your browser to see detailed instructions on how to load the extension in ScratchX and the Scratch 2 Offline Editor.
 
-![Scratch screenshot](scratch_screenshot.png)
+![Scratch screenshot](images/scratch_screenshot.png)
 
 There also is a Controller UI that allows you to control the board manually from your browser - great for testing.
 
