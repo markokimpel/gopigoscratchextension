@@ -61,28 +61,28 @@ The *Serial Peripheral Interface* (SPI) bus is used for communication between Ra
 
 Per default the SPI and I2C interface are disabled in Raspbian. To enable the interfaces go to menu *Preferences* > *Raspberry Pi Configuration*, tab *Interfaces*. Make sure the interfaces *SPI* and *I2C* are enabled.
 
+![Raspberry Pi Configuration](images/raspi-config.png)
+
 ### Python libraries for GoPiGo3 and sensors
 
-See https://github.com/DexterInd/GoPiGo3 for details.
+Install GoPiGo3 libraries, then reboot Raspberry Pi. See https://github.com/DexterInd/GoPiGo3 for details.
 
 ```
-$ sudo sh -c "curl -kL dexterindustries.com/update_gopigo3 | bash"
+pi@student-robot:~ $ sudo sh -c "curl -kL dexterindustries.com/update_gopigo3 | bash"
+pi@student-robot:~ $ sudo shutdown -r now
 ```
 
-Install DI_sensors (https://github.com/DexterInd/DI_Sensors)
+Install support for sensors. See https://github.com/DexterInd/DI_Sensors for details.
 
 ```
-$ cd ~
-$ git clone https://github.com/simonmonk/raspirobotboard3.git
-$ cd raspirobotboard3/python
-$ sudo python setup.py install
+pi@student-robot:~ $ curl -kL dexterindustries.com/update_sensors | sudo bash
 ```
 
 ### Scratch extension
 
 ```
-$ cd ~
-$ git clone https://github.com/markokimpel/rrbscratchextension.git
+pi@student-robot:~ $ cd ~
+pi@student-robot:~ $ git clone https://github.com/markokimpel/gopigoscratchextension.git
 ```
 
 ## Use Scratch
@@ -90,17 +90,17 @@ $ git clone https://github.com/markokimpel/rrbscratchextension.git
 First, the server needs to be started.
 
 ```
-$ cd ~/rrbscratchextension/rrbserver/
-$ ./run.sh
+pi@student-robot:~ $ cd ~/gopigoscratchextension/gpg3server/
+pi@student-robot:~/gopigoscratchextension/gpg3server $ ./run.sh
 Server listening at 0.0.0.0:8080
 
-RRB3 Server homepage : http://<your_ip_addr>:8080/
+GPG3 Server homepage : http://<your_ip_addr>:8080/
 Scratch extension URL: http://<your_ip_addr>:8080/scratch_extension.js
 
 Press Ctrl-C to stop server
 ```
 
-Open the RRB Server homepage with your browser to see detailed instructions on how to load the extension in ScratchX and the Scratch 2 Offline Editor.
+Open the GoPiGo3 Server homepage with your browser to see detailed instructions on how to load the extension in ScratchX and the Scratch 2 Offline Editor.
 
 ![Scratch screenshot](scratch_screenshot.png)
 
