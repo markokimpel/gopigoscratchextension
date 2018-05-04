@@ -119,6 +119,7 @@ The current implementation requires a distance sensor to be connected.
 
 The server exposes expansion board functionality through unsecured HTTP endpoints. Everyone with access to the endpoints can control the board. The server needs to be run in a network that guards against unauthorized access.
 
+
 *Copyright 2018 Marko Kimpel*
 
-*Licensed under the Apache License, Version 2.0.*
+*Licensed under the Apache License, Version 2.0. See LICENSE for details.*
