@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>GoPiGo3 Server</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <script src="jquery/jquery-3.2.1.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+  <div class="jumbotron">
+    <h1>GoPiGo3 Server</h1>
+    Provides an HTTP interface to the Python API of the <cite><a href="https://www.dexterindustries.com/gopigo3/" target="_blank">GoPiGo3</a></cite>.
+  </div>
+
+  <p>
+    The GoPiGo3 Server is part of the <a href="https://github.com/markokimpel/gopigoscratchextension">GoPiGo Scratch Extension</a>.
+  </p>
+
+  <h2>Controller</h2>
+  <p>
+    Use the <a href="controller.html">Controller UI</a> to send requests to the
+    GoPiGo3 Server from a webpage. Good for troubleshooting.
+  </p>
+
+  <h2>Scratch integration</h2>
+  <p>
+    The GoPiGo3 can be controlled with Scratch by installing an extension in
+    Scratch. The extension will connect to the GoPiGo3 server. Scratch and the
+    GoPiGo3 Server may be running on different computers. The installation
+    procedures for different versions of Scratch are detailed below.
+  </p>
+
+  <h3>ScratchX online</h3>
+  <p>
+    Use the ScratchX website <a href="http://scratchx.org/#scratch">http://scratchx.org/#scratch</a>.
+    The ScratchX editor is a Flash application running in your browser. The
+    GoPiGo3 Server needs to be reachable from the computer the browser is
+    running on.
+  </p>
+  <p>
+    <ul>
+      <li>The GoPiGo3 Server needs to be running.</li>
+      <li>With your browser go to <a href="http://scratchx.org/#scratch">http://scratchx.org/#scratch</a>.</li>
+      <li>Click button <cite>Load Experimental Extension</cite> in the top right corner.</li>
+      <li>At <cite>Open an Extension URL</cite> paste <code>http://{{host_port}}/scratch_extension.js</code>. <cite>Open</cite>.</li>
+      <li>Confirm the warning with <cite>I understand, continue</cite>.</li>
+      <li>In group <cite>More Blocks</cite> you will find the new blocks.</li>
+    </ul>
+  </p>
+  <p>
+    After loading a saved project the blocks from the extension will be shown in
+    red (with label <cite>undefined</cite>). Repeat the steps above to load the
+    extension.
+  </p>
+
+  <h3>Scratch 2 Offline Editor</h3>
+  <p>
+    Use the <cite>Scratch 2</cite> application that is pre-installed on Raspbian.
+    No Internet connection is required.
+  </p>
+  <p>
+    <ul>
+      <li>The GoPiGo3 Server needs to be running.</li>
+      <li>Press <cite>Shift</cite> key and click <cite>File</cite> menu at the same time.</li>
+      <li>Select <cite>Import experimental extension</cite> .</li>
+      <li>Enter <code>http://{{host_port}}/scratch_extension.js</code>. <cite>Load</cite>.</li>
+      <li>In <cite>Scripts</cite>, group <cite>More Blocks</cite> you will find the new blocks.</li>
+    </ul>
+  </p>
+  <p>
+    If a project uses an <cite>experimental extension</cite>, <cite>Save Project</cite>
+    will always use the <cite>sbx</cite> file extension. Curiously, <cite>Load Project</cite>
+    insists on the <cite>sb2</cite> file extension. Renaming the file will make
+    things work but is tedious. A workaround is to use a symbolic link to make
+    the file exist under two names. Then <cite>Save Project</cite> will write to
+    the <cite>sbx</cite> file, and <cite>Load Project</cite> load the same
+    content from the <cite>sb2</cite> file.
+    <pre>
+    pi@student-robot:~/Scratch $ ln -s myproject.sbx myproject.sb2
+    pi@student-robot:~/Scratch $ ls -l
+    rwxrwxrwx 1 pi pi    10 Feb 22 14:33 myproject.sb2 -> myproject.sbx
+    rw------- 1 pi pi 55429 Feb 22 13:50 myproject.sbx
+    pi@student-robot:~/Scratch $</pre>
+  </p>
+  <p>
+    After loading a saved project the blocks from the extension will be shown in
+    red (with label <cite>undefined</cite>). Repeat the steps above to load the
+    extension.
+  </p>
+
+  <h3>Unsupported versions</h3>
+  <p>
+    There is no integration with the original version of Scratch (version 1).
+  </p>
+  <p>
+    There is no integration with the online version of Scratch at
+    <a href="http://scratch.mit.org/">scratch.mit.org</a>. That version does
+    not support extensions. Please use ScratchX instead.
+  </p>
+
+  <p>
+    <em>Copyright 2018 Marko Kimpel</em>
+  </p>
+
+</div>
+</body>
+</html>
