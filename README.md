@@ -4,6 +4,8 @@ Control the Raspberry Pi expansion board *[GoPiGo3](https://www.dexterindustries
 
 The GoPiGo3 is made by [Dexter Industries](https://www.dexterindustries.com/). Scratch was developed by the [MIT Media Lab](https://www.media.mit.edu/).
 
+![GoPiGo3 with servo and distance sensor](images/rover_front.jpg)
+
 ## Features
 
 The following GoPiGo3 or Raspberry Pi features are supported by the Scratch extension:
@@ -56,7 +58,9 @@ pi@student-robot:~ $ sudo apt upgrade
 
 ### Enable SPI and I2C interfaces
 
-The *Serial Peripheral Interface* (SPI) bus is used for communication between Raspberry Pi and GoPiGo3 board. The *Inter-Integrated Circuit* (I2C) bus can be used to connect I2C devices (e.g. distance sensor) to the Raspberry Pi. The GoPiGo3 board provides two I2C [Grove](http://wiki.seeedstudio.com/Grove_System/) connectors that are directly connected to the Raspberry Pi.
+The *Serial Peripheral Interface* (SPI) bus is used for communication between Raspberry Pi and GoPiGo3 board.
+
+The *Inter-Integrated Circuit* (I2C) bus can be used to connect I2C devices (e.g. distance sensor) to the Raspberry Pi. The GoPiGo3 board provides two I2C [Grove](http://wiki.seeedstudio.com/Grove_System/) connectors that are directly connected to the Raspberry Pi.
 
 Per default the SPI and I2C interface are disabled in Raspbian. To enable the interfaces go to menu *Preferences* > *Raspberry Pi Configuration*, tab *Interfaces*. Make sure the interfaces *SPI* and *I2C* are enabled.
 
@@ -105,7 +109,7 @@ Open the GoPiGo3 Server homepage with your browser to see detailed instructions 
 
 There also is a Controller UI that allows you to control the board manually from your browser - great for testing.
 
-![Controller UI](rrb3_controller.png)
+![Controller UI](images/gpg3server_controller.png)
 
 # Limitations
 
