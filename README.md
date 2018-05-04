@@ -1,22 +1,47 @@
 # GoPiGo Scratch Extension
 
-Control the Raspberry Pi expansion board *[RasPiRobot Board V3](https://www.monkmakes.com/rrb3/)* from the programming language *Scratch*. *[ScratchX](http://scratchx.org/#scratch)* and the *Scratch 2 Offline Editor* are supported.
+Control the Raspberry Pi expansion board *[GoPiGo3](https://www.dexterindustries.com/gopigo3/)* from the programming language *[Scratch](https://en.wikipedia.org/wiki/Scratch_(programming_language))*. *[ScratchX](http://scratchx.org/#scratch)* and the *Scratch 2 Offline Editor* are supported.
 
-The RasPiRobot Board V3 is made by [Monk Makes](https://www.monkmakes.com/). Scratch was developed by the MIT Media Lab.
+The GoPiGo3 is made by [Dexter Industries](https://www.dexterindustries.com/). Scratch was developed by the [MIT Media Lab](https://www.media.mit.edu/).
+
+## Features
+
+The following GoPiGo3 or Raspberry Pi features are supported by the Scratch extension:
+
+* GoPiGo3 motion control
+  * drive forward/backward specific distance at specific speed and then stop
+  * drive forward/backward at specific speed until another motor command is sent
+  * turn given degrees to the left/right at specific speed and then stop
+  * turn to the left/right at specific speed until another motor command is sent
+  * set speed and direction for left and right motor individually and maintain until another motor command is sent
+  * stop motors
+* Servo control
+  * set position (0..180 degrees) for servo motors connected to Servo 1 or Servo 2 connectors
+* Distance sensor
+  * read distance in cm
+* Blinkers (two red LED lights at the front of the GoPiGo3 board)
+  * turn on/off individually or both at the same time
+* Eyes (two RGB LED lights on top of GoPiGo3 board)
+  * control individually or both eyes at the same time
+  * set color and brightness by specification of RGB components
+
+![Scratch Blocks](images/scratch_blocks.png)
 
 ## Compatibility
 
 Tested with
 * *Raspberry Pi 3 Model B*
-* *RasPiRobot Board V3*
-* *Rasbian Stretch with Desktop* Version *September 2017* with latest updates as of 24-Nov-2017
-* *Python library for RasPiRobot Board V3* as of 12-Nov-2017
-* *ScratchX* as of 23-Nov-2017
-* *Scratch 2 Offline Editor* (as it comes with Raspbian, as of 24-Nov-2017)
+* *GoPiGo3*
+* *[Servo](https://www.dexterindustries.com/shop/servo-package/)*
+* *[Distance Sensor](https://www.dexterindustries.com/shop/distance-sensor/)*
+* *Rasbian Stretch with Desktop* Version *April 2018* with latest updates as of 03-May-2018
+* *Python libraries for GoPiGo3* as of 03-May-2018
+* *ScratchX* as of 03-May-2018
+* *Scratch 2 Offline Editor* (as it comes with Raspbian, as of 03-May-2018)
 
 ## Approach
 
-This extension comes with a server that needs to run on the Raspberry Pi that has the RasPiRobot Board V3 attached to it. The server exposes expansion board functionality through HTTP endpoints. It used the RasPiRobot Board V3 Python library to control the board. In Scratch an extension needs to be loaded. The extension exposes board functionality as additional Scratch blocks. Scratch can be running on the same computer as the server, or a different one. It needs to be able to connect to the server.
+This extension comes with a server that needs to run on the Raspberry Pi that has the GoPiGo3 board attached to it. The server exposes expansion board functionality through HTTP endpoints. It uses GoPiGo3 Python libraries to control the board. In Scratch an extension needs to be loaded. The extension exposes board functionality as additional Scratch blocks. Scratch can be running on the same computer as the server, or a different one. It needs to be able to connect to the server.
 
 ## Installation
 
@@ -30,9 +55,21 @@ Update Rasbian with
  $ sudo apt upgrade
  ```
 
-### Python library for RasPiRobot Board V3
+### Enable SPI and I2C interfaces
 
-See https://github.com/simonmonk/raspirobotboard3 for details.
+The *Serial Peripheral Interface* (SPI) bus is used for communication between Raspberry Pi and GoPiGo3 board. The *Inter-Integrated Circuit* (I2C) bus can be used to connect I2C devices (e.g. distance sensor) to the Raspberry Pi. The GoPiGo3 board provides two I2C [Grove](http://wiki.seeedstudio.com/Grove_System/) connectors that are directly connected to the Raspberry Pi.
+
+Per default the SPI and I2C interface are disabled in Raspbian. To enable the interfaces go to menu *Preferences* > *Raspberry Pi Configuration*, tab *Interfaces*. Make sure the interfaces *SPI* and *I2C* are enabled.
+
+### Python libraries for GoPiGo3 and sensors
+
+See https://github.com/DexterInd/GoPiGo3 for details.
+
+```
+$ sudo sh -c "curl -kL dexterindustries.com/update_gopigo3 | bash"
+```
+
+Install DI_sensors (https://github.com/DexterInd/DI_Sensors)
 
 ```
 $ cd ~
@@ -70,6 +107,10 @@ Open the RRB Server homepage with your browser to see detailed instructions on h
 There also is a Controller UI that allows you to control the board manually from your browser - great for testing.
 
 ![Controller UI](rrb3_controller.png)
+
+# Limitations
+
+TODO
 
 # Security
 
