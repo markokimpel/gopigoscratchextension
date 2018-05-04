@@ -1,14 +1,14 @@
 # GoPiGo Scratch Extension
 
-Control the Raspberry Pi expansion board *[GoPiGo3](https://www.dexterindustries.com/gopigo3/)* from the programming language *Scratch*. *[ScratchX](http://scratchx.org/#scratch)* and the *Scratch 2 Offline Editor* are supported.
+Control the Raspberry Pi expansion board *[GoPiGo3](https://www.dexterindustries.com/gopigo3/)* from the programming language *[Scratch](https://en.wikipedia.org/wiki/Scratch_(programming_language))*. *[ScratchX](http://scratchx.org/#scratch)* and the *Scratch 2 Offline Editor* are supported.
 
-The GoPiGo3 is made by [Dexter Industries](https://www.dexterindustries.com/). Scratch was developed by the MIT Media Lab.
+The GoPiGo3 is made by [Dexter Industries](https://www.dexterindustries.com/). Scratch was developed by the [MIT Media Lab](https://www.media.mit.edu/).
 
 ## Features
 
 The following GoPiGo3 or Raspberry Pi features are supported by the Scratch extension:
 
-* Motor controls
+* GoPiGo3 motion control
   * drive forward/backward specific distance at specific speed and then stop
   * drive forward/backward at specific speed until another motor command is sent
   * turn given degrees to the left/right at specific speed and then stop
@@ -16,7 +16,7 @@ The following GoPiGo3 or Raspberry Pi features are supported by the Scratch exte
   * set speed and direction for left and right motor individually and maintain until another motor command is sent
   * stop motors
 * Servo control
-  * set position (0..180 degrees) for servos connected to Servo 1 or Servo 2 connector
+  * set position (0..180 degrees) for servo motors connected to Servo 1 or Servo 2 connectors
 * Distance sensor
   * read distance in cm
 * Blinkers (two red LED lights at the front of the GoPiGo3 board)
@@ -25,13 +25,15 @@ The following GoPiGo3 or Raspberry Pi features are supported by the Scratch exte
   * control individually or both eyes at the same time
   * set color and brightness by specification of RGB components
 
+![Scratch Blocks](images/scratch_blocks.png)
+
 ## Compatibility
 
 Tested with
 * *Raspberry Pi 3 Model B*
 * *GoPiGo3*
-* *Servo*
-* *Distance Sensor*
+* *[Servo](https://www.dexterindustries.com/shop/servo-package/)*
+* *[Distance Sensor](https://www.dexterindustries.com/shop/distance-sensor/)*
 * *Rasbian Stretch with Desktop* Version *April 2018* with latest updates as of 03-May-2018
 * *Python libraries for GoPiGo3* as of 03-May-2018
 * *ScratchX* as of 03-May-2018
@@ -39,7 +41,7 @@ Tested with
 
 ## Approach
 
-This extension comes with a server that needs to run on the Raspberry Pi that has the GoPiGo3 board attached to it. The server exposes expansion board functionality through HTTP endpoints. It used GoPiGo3 Python libraries to control the board. In Scratch an extension needs to be loaded. The extension exposes board functionality as additional Scratch blocks. Scratch can be running on the same computer as the server, or a different one. It needs to be able to connect to the server.
+This extension comes with a server that needs to run on the Raspberry Pi that has the GoPiGo3 board attached to it. The server exposes expansion board functionality through HTTP endpoints. It uses GoPiGo3 Python libraries to control the board. In Scratch an extension needs to be loaded. The extension exposes board functionality as additional Scratch blocks. Scratch can be running on the same computer as the server, or a different one. It needs to be able to connect to the server.
 
 ## Installation
 
