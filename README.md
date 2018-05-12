@@ -106,6 +106,9 @@ Scratch extension URL: http://<your_ip_addr>:8080/scratch_extension.js
 Press Ctrl-C to stop server
 ```
 
+During operation the server prints log messages about received requests. This is
+normal and nothing to worry about. :-)
+
 Open the GoPiGo3 Server homepage with your browser to see detailed instructions on how to load the extension in ScratchX and the Scratch 2 Offline Editor.
 
 ![Scratch screenshot](images/scratch_screenshot.png)
@@ -133,10 +136,6 @@ Press Ctrl-C to stop server
 Open the shown URL in your browser.
 
 ![video streaming](images/video_streaming.png)
-
-# Limitations
-
-The current implementation requires a distance sensor to be connected.
 
 # Security
 

@@ -584,11 +584,13 @@ if __name__ == "__main__":
 
     egpg3 = EasyGoPiGo3(use_mutex=True)
     try:
-        # TODO: Make configurable what hardware is connected.
+        # TODO: Make configurable what hardware is connected. Here we just
+        # initialize both servo ports - if used or not - and try to initialize
+        # the distance sensor.
 
         servos = {
             'SERVO1': egpg3.init_servo(port = "SERVO1"),
-            'SERVO2': None
+            'SERVO2': egpg3.init_servo(port = "SERVO2")
         }
 
         # move servos in middle position
@@ -596,7 +598,11 @@ if __name__ == "__main__":
             if servos[port] is not None:
                 servos[port].reset_servo()
 
-        distance_sensor = egpg3.init_distance_sensor()
+        try:
+            distance_sensor = egpg3.init_distance_sensor()
+        except:
+            print("No distance sensor found")
+            distance_sensor = None
 
         # start HTTP server
 
