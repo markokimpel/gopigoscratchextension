@@ -24,14 +24,17 @@ The following GoPiGo3 or Raspberry Pi features are supported by the Scratch exte
 * Eyes (two RGB LED lights on top of GoPiGo3 board)
   * control individually or both eyes at the same time
   * set color and brightness by specification of RGB components
+* Video streaming
+  * Stream robot's view to your browser
 
 ![Scratch Blocks](images/scratch_blocks.png)
 
 ## Compatibility
 
 Tested with
-* *Raspberry Pi 3 Model B*
-* *GoPiGo3*
+* *[Raspberry Pi 3 Model B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)*
+* *[Raspberry Pi Camera Module v2](https://www.raspberrypi.org/products/camera-module-v2/)*
+* *[GoPiGo3](https://www.dexterindustries.com/gopigo3/)*
 * *[Servo](https://www.dexterindustries.com/shop/servo-package/)*
 * *[Distance Sensor](https://www.dexterindustries.com/shop/distance-sensor/)*
 * *Rasbian Stretch with Desktop* Version *April 2018* with latest updates as of 03-May-2018
