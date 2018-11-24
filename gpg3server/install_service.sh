@@ -21,10 +21,7 @@ WantedBy=multi-user.target' >/etc/systemd/system/gpg3server.service"
 # Make sure file permissions are 644.
 sudo chown 644 /etc/systemd/system/gpg3server.service
 
-# Reload service definitions and enable service.
+# Reload service definitions.
 sudo systemctl daemon-reload
-sudo systemctl enable gpg3server
 
-echo "Service gpg3server installed and enabled."
-echo "You can start the service with 'sudo systemctl start gpg3server'".
-echo "You can check service status with 'systemctl status gpg3server'".
+echo "Service gpg3server has been installed."

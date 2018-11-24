@@ -1,29 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>GoPiGo3 Server</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
-    <script src="jquery/jquery-3.2.1.min.js"></script>
-    <script src="bootstrap/js/bootstrap.min.js"></script>
+  <title>GoPiGo3 Server</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+  <script src="jquery/jquery-3.2.1.min.js"></script>
+  <script src="bootstrap/js/bootstrap.min.js"></script>
 </head>
 <body>
 <div class="container">
 
   <div class="jumbotron">
     <h1>GoPiGo3 Server</h1>
-    Provides an HTTP interface to the Python API of the <cite><a href="https://www.dexterindustries.com/gopigo3/" target="_blank">GoPiGo3</a></cite>.
+    Provides an HTTP interface to the Python API of the 
+    <cite><a href="https://www.dexterindustries.com/gopigo3/" target="_blank">GoPiGo3</a></cite>.
   </div>
 
   <p>
-    The GoPiGo3 Server is part of the <a href="https://github.com/markokimpel/gopigoscratchextension">GoPiGo Scratch Extension</a>.
+    The GoPiGo3 Server is part of the 
+    <a href="https://github.com/markokimpel/gopigoscratchextension">GoPiGo Scratch Extension</a>.
   </p>
 
   <h2>Controller</h2>
   <p>
     Use the <a href="controller.html">Controller UI</a> to send requests to the
-    GoPiGo3 Server from a webpage. Good for troubleshooting.
+    GoPiGo3 Server from a browser. Good for troubleshooting.
+  </p>
+
+  <h2>Video stream</h2>
+  <p>
+    If the Raspberry Pi comes with a camera module attached you can view the 
+    camera <a href="camera.html" target="camera">video stream</a> in a browser.
   </p>
 
   <h2>Scratch integration</h2>
@@ -36,7 +44,8 @@
 
   <h3>ScratchX online</h3>
   <p>
-    Use the ScratchX website <a href="http://scratchx.org/#scratch">http://scratchx.org/#scratch</a>.
+    Use the ScratchX website 
+    <a href="http://scratchx.org/#scratch">http://scratchx.org/#scratch</a>.
     The ScratchX editor is a Flash application running in your browser. The
     GoPiGo3 Server needs to be reachable from the computer the browser is
     running on.
@@ -72,13 +81,14 @@
     </ul>
   </p>
   <p>
-    If a project uses an <cite>experimental extension</cite>, <cite>Save Project</cite>
-    will always use the <cite>sbx</cite> file extension. Curiously, <cite>Load Project</cite>
-    insists on the <cite>sb2</cite> file extension. Renaming the file will make
-    things work but is tedious. A workaround is to use a symbolic link to make
-    the file exist under two names. Then <cite>Save Project</cite> will write to
-    the <cite>sbx</cite> file, and <cite>Load Project</cite> load the same
-    content from the <cite>sb2</cite> file.
+    If a project uses an <cite>experimental extension</cite>, 
+    <cite>Save Project</cite> will always use the <cite>sbx</cite> file 
+    extension. Curiously, <cite>Load Project</cite> insists on the 
+    <cite>sb2</cite> file extension. Renaming the file will make things work 
+    but is tedious. A workaround is to use a symbolic link to make the file 
+    exist under two names. Then <cite>Save Project</cite> will write to the 
+    <cite>sbx</cite> file, and <cite>Load Project</cite> load the same content 
+    from the <cite>sb2</cite> file.
     <pre>
     pi@student-robot:~/Scratch $ ln -s myproject.sbx myproject.sb2
     pi@student-robot:~/Scratch $ ls -l
@@ -97,9 +107,15 @@
     There is no integration with the original version of Scratch (version 1).
   </p>
   <p>
-    There is no integration with the online version of Scratch at
-    <a href="http://scratch.mit.org/">scratch.mit.org</a>. That version does
+    There is no integration with the online version of Scratch 2 at
+    <a href="https://scratch.mit.edu/">scratch.mit.edu</a>. That version does
     not support extensions. Please use ScratchX instead.
+  </p>
+  <p>
+    There is no integration with the upcoming version of Scratch (Scratch 3.0) at
+    <a href="https://beta.scratch.mit.edu/">beta.scratch.mit.edu</a> yet. The Scratch
+    team hasn't published API documentation for Scratch 3 extensions yet. Once it's
+    out, we will take a closer look.
   </p>
 
   <p>

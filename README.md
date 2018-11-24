@@ -4,7 +4,7 @@ Control the Raspberry Pi expansion board *[GoPiGo3](https://www.dexterindustries
 
 The GoPiGo3 is made by [Dexter Industries](https://www.dexterindustries.com/). Scratch was developed by the [MIT Media Lab](https://www.media.mit.edu/).
 
-![GoPiGo3 with servo and distance sensor](images/rover_front.jpg)
+![GoPiGo3 with servo, distance sensor and camera module](images/rover_front.jpg)
 
 ## Features
 
@@ -26,7 +26,7 @@ The following GoPiGo3 or Raspberry Pi features are supported by the Scratch exte
   * set position (0..180 degrees) for servo motors connected to Servo 1 or Servo 2 connectors
 * Distance sensor
   * read distance in cm
-* Video streaming
+* Video streaming from camera module
   * Stream robot's view to your browser
 
 ## Compatibility
@@ -37,12 +37,12 @@ Tested with
 * *[GoPiGo3](https://www.dexterindustries.com/gopigo3/)*
 * *[Servo](https://www.dexterindustries.com/shop/servo-package/)*
 * *[Distance Sensor](https://www.dexterindustries.com/shop/distance-sensor/)*
-* *Rasbian Stretch with Desktop* Version *April 2018* with latest updates as of 03-May-2018
+* *Rasbian Stretch with Desktop* Version *April 2018* with latest updates as of 22-Nov-2018
 * *Python libraries for GoPiGo3* as of 03-May-2018
-* *ScratchX* as of 03-May-2018
-* *Scratch 2 Offline Editor* (as it comes with Raspbian, as of 03-May-2018)
+* *ScratchX* as of 18-Nov-2018
+* *Scratch 2 Offline Editor* (as it comes with Raspbian, as of 22-Nov-2018)
 
-## Approach
+## How the extension works
 
 This extension comes with a server that needs to run on the Raspberry Pi that has the GoPiGo3 board attached to it. The server exposes expansion board functionality through HTTP endpoints. It uses GoPiGo3 Python libraries to control the board. In Scratch an extension needs to be loaded. The extension exposes board functionality as additional Scratch blocks. Scratch can be running on the same computer as the server, or a different one. It needs to be able to connect to the server.
 
@@ -74,30 +74,36 @@ Per default the SPI and I2C interface are disabled in Raspbian. To enable the in
 Install GoPiGo3 libraries, then reboot Raspberry Pi. See https://github.com/DexterInd/GoPiGo3 for details.
 
 ```
-pi@student-robot:~ $ sudo sh -c "curl -kL dexterindustries.com/update_gopigo3 | bash"
+pi@student-robot:~ $ curl -L https://dexterindustries.com/update_gopigo3 | bash
 pi@student-robot:~ $ sudo shutdown -r now
 ```
 
 Install support for sensors. See https://github.com/DexterInd/DI_Sensors for details.
 
 ```
-pi@student-robot:~ $ curl -kL dexterindustries.com/update_sensors | sudo bash
+pi@student-robot:~ $ curl -L https://dexterindustries.com/update_sensors | bash
 ```
 
 ### Scratch extension
 
-```
-pi@student-robot:~ $ cd ~
-pi@student-robot:~ $ git clone https://github.com/markokimpel/gopigoscratchextension.git
-```
-
-## Use Scratch
-
-First, the server needs to be started.
+Download the Scratch extension.
 
 ```
-pi@student-robot:~ $ cd ~/gopigoscratchextension/gpg3server/
-pi@student-robot:~/gopigoscratchextension/gpg3server $ ./run.sh
+pi@student-robot:~ $ git clone https://github.com/markokimpel/gopigoscratchextension.git ~/gopigoscratchextension/
+```
+
+Make the GoPiGo3 Server start automatically when Raspbian starts.
+
+```
+pi@student-robot:~ $ sudo ~/gopigoscratchextension/gpg3server/install_service.sh
+pi@student-robot:~ $ sudo systemctl enable gpg3server
+pi@student-robot:~ $ sudo systemctl start gpg3server
+```
+
+Alternatively you can start the service manually every time you need it.
+
+```
+pi@student-robot:~ $ ~/gopigoscratchextension/gpg3server/run.sh
 Server listening at 0.0.0.0:8080
 
 GPG3 Server homepage : http://<your_ip_addr>:8080/
@@ -106,12 +112,13 @@ Scratch extension URL: http://<your_ip_addr>:8080/scratch_extension.js
 Press Ctrl-C to stop server
 ```
 
-During operation the server prints log messages about received requests. This is
-normal and nothing to worry about. :-)
+## Use Scratch
 
-Open the GoPiGo3 Server homepage with your browser to see detailed instructions on how to load the extension in ScratchX and the Scratch 2 Offline Editor.
+The GoPiGo3 Server needs to be running (see above).
 
-![Scratch screenshot](images/scratch_screenshot.png)
+Open the GoPiGo3 Server homepage with your browser. The address is `http://<your_raspberrypi>:8080/` (replace *<your_raspberrypi>* with the hostname or IP address of your Raspberry Pi). The homepage contains detailed instructions on how to load the extension in ScratchX and the Scratch 2 Offline Editor.
+
+![Scratch 2 Offline Editor screenshot](images/scratch_screenshot.png)
 
 There also is a Controller UI that allows you to control the board manually from your browser - great for testing.
 
@@ -119,27 +126,15 @@ There also is a Controller UI that allows you to control the board manually from
 
 ## Use video streaming
 
-First, the streaming server needs to be started.
+The GoPiGo3 Server homepage (see above) shows a link to a MJPEG video stream from Raspberry Pi's camera module. Use your browser to view the stream.
 
-```
-pi@student-robot:~ $ cd ~/gopigoscratchextension/streamingserver/
-pi@student-robot:~/gopigoscratchextension/streamingserver $ ./run.sh
-Camera: 320x240, 10 fps
+![Video streaming](images/video_streaming.png)
 
-Server listening at 0.0.0.0:8081
-
-Browser URL: http://<your_ip_addr>:8081/
-
-Press Ctrl-C to stop server
-```
-
-Open the shown URL in your browser.
-
-![video streaming](images/video_streaming.png)
+Most browsers support zoom in and out with *Ctrl*+*+* and *Ctrl*+*-*.
 
 # Security
 
-The server exposes expansion board functionality through unsecured HTTP endpoints. Everyone with access to the endpoints can control the board. The server needs to be run in a network that guards against unauthorized access.
+The GoPiGo3 Server exposes expansion board functionality and camera module's video stream through unsecured HTTP endpoints. Everyone with access to the endpoints can control the board or view the video stream. The server needs to be run in a network that guards against unauthorized access.
 
 *Copyright 2018 Marko Kimpel*
 

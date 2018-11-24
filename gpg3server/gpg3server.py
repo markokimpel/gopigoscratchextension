@@ -21,6 +21,7 @@
 # User pages:
 #     /                 homepage
 #     /controller.html  UI to manually control GoPiGo3
+#     /camera.html      Camera video stream page
 #
 # Scratch extension:
 #     /scratch_extension.js
@@ -57,26 +58,33 @@
 #
 #     GET  /v1/sensors/I2C/distance/distance
 #          { "distance": 523 } (in mm)
+#
+# Camera support:
+#     /camera.mjpg  Camera video stream as M-JPEG
 
-from http.server import HTTPServer, BaseHTTPRequestHandler
+import http.server
 import json
-from mimetypes import MimeTypes
+import mimetypes
 import socket
-from socketserver import ThreadingMixIn
+import socketserver
 import time
 import urllib.parse
 
-from easygopigo3 import EasyGoPiGo3
+import easygopigo3
 
-class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
-    pass
+import camera
 
-class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
+class ThreadingHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
+    allow_reuse_address = True
+    daemon_threads = True
+
+class GPG3ServerHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
     # whitelist of allowed paths
     ALLOWED_TEXT_DOWNLOADS = {
         "/",
         "/controller.html",
+        "/camera.html",
         "/controller.js",
         "/scratch_extension.js",
         "/jquery/jquery-3.2.1.min.js",
@@ -99,7 +107,7 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
             else:
                 fname = "static" + self.path
 
-            # read file
+            # read file in text mode
             with open(fname, "r") as f:
                 content = f.read()
 
@@ -109,36 +117,35 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
                 host_port = 'localhost'
 
             content = content.replace('{{host_port}}', host_port)
+            binary = content.encode()
 
             self.send_response(200)
-
             # set Content-Type
             # guess content type based on URL path
-            content_type = MimeTypes().guess_type(fname)[0]
+            content_type = mimetypes.MimeTypes().guess_type(fname)[0]
             if content_type is not None:
                 self.send_header('Content-Type', content_type + "; charset=UTF-8")
-            # TODO: send Content-Length header
+            self.send_header('Content-Length', len(binary))
             self.end_headers()
 
             # send content to requester
-            self.wfile.write(content.encode())
+            self.wfile.write(binary)
 
         # binary file download
         elif self.path in self.ALLOWED_BINARY_DOWNLOADS:
 
             fname = "static" + self.path
 
-            # read file
+            # read file in binary mode
             with open(fname, "rb") as f:
                 content = f.read()
 
             self.send_response(200)
-
             # set Content-Type
-            content_type = MimeTypes().guess_type(fname)[0]
+            content_type = mimetypes.MimeTypes().guess_type(fname)[0]
             if content_type is not None:
                 self.send_header('Content-Type', content_type)
-            # TODO: send Content-Length header
+            self.send_header('Content-Length', len(content))
             self.end_headers()
 
             # send content to requester
@@ -204,6 +211,33 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
                 }
 
             self.send_json_response(data)
+
+        elif self.path == '/camera.mjpg':
+
+            self.send_response(200)
+            self.send_header('Age', 0)
+            self.send_header('Cache-Control', 'no-cache, private')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+            self.end_headers()
+
+            with camera.CameraMJPEGStream() as stream:
+
+                while True:
+
+                    frame = stream.get_frame()
+
+                    try:
+                        self.wfile.write(b'--FRAME\r\n')
+                        self.send_header('Content-Type', 'image/jpeg')
+                        self.send_header('Content-Length', len(frame))
+                        self.end_headers()
+                        self.wfile.write(frame)
+                        self.wfile.write(b'\r\n')
+                    except ConnectionError:
+                        self.log_error('"%s" ended with ConnectionError', 
+                            self.requestline)
+                        break
 
         else:
             self.send_error(404, "Unknown path " + self.path)
@@ -512,8 +546,7 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_error(404, "Unknown path " + self.path)
 
     def do_OPTIONS(self):
-
-        # needed for CORS pre-flight requests
+        """ needed for CORS pre-flight requests """
 
         if self.headers.get('Origin') is None:
             self.send_error(501, "Non-CORS OPTIONS request not implemented")
@@ -529,29 +562,41 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
 
         self.end_headers()
 
-    # Read request body and parse as JSON.
-    # Typically used by PUT and POST operations.
     def receive_json_request(self):
+        """
+        Read request body and parse as JSON.
+
+        Typically used by PUT and POST operations.
+        """
         # read and parse request data
         data_bytes = self.rfile.read(int(self.headers['Content-Length']))
         data_string = data_bytes.decode()
         return json.loads(data_string)
 
-    # Send 200 success response with JSON as body.
-    # Typically used for GET operations.
     def send_json_response(self, data):
+        """
+        Send 200 success response with JSON as body.
+        
+        Typically used for GET operations.
+        """
+
         data_string = json.dumps(data)
+        binary = data_string.encode()
+
         self.send_response(200)
         if self.headers.get('Origin') is not None:
             self.send_header("Access-Control-Allow-Origin", self.headers.get('Origin'))
         self.send_header("Content-Type", "application/json; charset=UTF-8")
-        # TODO: write Content-Length
+        self.send_header('Content-Length', len(binary))
         self.end_headers()
-        self.wfile.write(data_string.encode())
+        self.wfile.write(binary)
 
-    # Send 204 no content response.
-    # Typically used for PUT and POST operations.
     def send_no_content_response(self):
+        """
+        Send 204 no content response.
+
+        Typically used for PUT and POST operations.
+        """
         self.send_response(204)
         if self.headers.get('Origin') is not None:
             self.send_header("Access-Control-Allow-Origin", self.headers.get('Origin'))
@@ -564,9 +609,11 @@ class GPG3ServerHTTPRequestHandler(BaseHTTPRequestHandler):
         except ValueError:
             return False
 
-# Try to find own ip address by establishing connection to arbitrary host
-# (without sending data).
 def get_own_ip():
+    """
+    Try to find own ip address by establishing connection to arbitrary host
+    (without sending data).
+    """
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         s.connect(('8.8.8.8', 80))
@@ -582,7 +629,7 @@ if __name__ == "__main__":
 
     # initialize GPG3 objects
 
-    egpg3 = EasyGoPiGo3(use_mutex=True)
+    egpg3 = easygopigo3.EasyGoPiGo3(use_mutex=True)
     try:
         # TODO: Make configurable what hardware is connected. Here we just
         # initialize both servo ports - if used or not - and try to initialize
