@@ -84,7 +84,7 @@ Install support for sensors. See https://github.com/DexterInd/DI_Sensors for det
 pi@student-robot:~ $ curl -L https://dexterindustries.com/update_sensors | bash
 ```
 
-### Scratch extension
+### GoPiGo3 Server
 
 Download the Scratch extension.
 
