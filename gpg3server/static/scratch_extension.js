@@ -197,7 +197,7 @@
   var descriptor = {
     blocks: [
       ["w", "turn %m.blinkers %m.onOff",                         "setBlinkers", "both blinkers", "on" ],
-      ["w", "set %m.eyes to %n % red %n % green %n % blue",      "setEyes", "both eyes",  0, 10, 10 ],
+      ["w", "set %m.eyes to red %n % green %n % blue %n %",      "setEyes", "both eyes",  0, 10, 10 ],
 
       ["w", "drive %m.forwardBackward %n cm at %n % speed",      "drive", "forward", 10, 50 ],
       ["w", "drive %m.forwardBackward at %n % speed",            "driveContiniously", "forward", 50 ],
