@@ -44,9 +44,9 @@ Tested with
 
 ## How the extension works
 
-This extension comes with a server that needs to run on the Raspberry Pi that has the GoPiGo3 board attached to it. The server exposes expansion board functionality through HTTP endpoints. It uses GoPiGo3 Python libraries to control the board. In Scratch an extension needs to be loaded. The extension exposes board functionality as additional Scratch blocks. Scratch can be running on the same computer as the server, or a different one. It needs to be able to connect to the server.
+This extension comes with a server that needs to run on the Raspberry Pi that has the GoPiGo3 board attached to it. The server exposes expansion board and camera functionality through HTTP endpoints. It uses the GoPiGo3 Python libraries to control the board, and the PiCamera library to expose the video stream. In Scratch an extension needs to be loaded. The extension exposes board functionality as additional Scratch blocks. Scratch can be running on the same computer as the server, or a different one. It needs to be able to connect to the server.
 
-## Installation
+## Server Installation
 
 ### Rasbian
 

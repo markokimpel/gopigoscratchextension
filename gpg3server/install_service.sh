@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Create systemd service for GoPiGo3 Server.
+#
+# Script needs to be run by user with sudo privileges.
+#
+# The service is not automatically enabled or started by the installation. 
+# To automatically start the service at system start use 
+# `sudo systemctl enable gpg3server`.
+# To start the service use `sudo systemctl start gpg3server`.
+
 # Make this folder current folder.
 cd "$(dirname "$0")"
 

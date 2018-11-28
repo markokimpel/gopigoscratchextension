@@ -28,8 +28,7 @@
   ext._shutdown = function() {};
 
   ext._getStatus = function() {
-    // TODO: do some connection/version tests
-    return {status: 2, msg: 'Ready'};
+    return {status: 2, msg: "Ready"};
   };
 
   ext.setBlinkers = function(blinkers, state, callback) {
@@ -197,33 +196,33 @@
   // Block and block menu descriptions
   var descriptor = {
     blocks: [
-      ['w', 'turn %m.blinkers %m.onOff',                         'setBlinkers', 'both blinkers', 'on' ],
-      ['w', 'set %m.eyes to %n % red %n % green %n % blue',      'setEyes', 'both eyes',  0, 10, 10 ],
+      ["w", "turn %m.blinkers %m.onOff",                         "setBlinkers", "both blinkers", "on" ],
+      ["w", "set %m.eyes to %n % red %n % green %n % blue",      "setEyes", "both eyes",  0, 10, 10 ],
 
-      ['w', 'drive %m.forwardBackward %n cm at %n % speed',      'drive', 'forward', 10, 50 ],
-      ['w', 'drive %m.forwardBackward at %n % speed',            'driveContiniously', 'forward', 50 ],
-      ['w', 'turn %n degrees to the %m.leftRight at %n % speed', 'turn', 90, 'left', 30 ],
-      ['w', 'turn %m.leftRight at %n % speed',                   'turnContiniously', 'left', 30 ],
-      ['w', 'set left motor %m.forwardBackward %n % speed right motor %m.forwardBackward %n % speed',
-                                                                 'setMotors', 'forward', 50, 'forward', 50 ],
-      ['w', 'stop motors',                                       'stopMotors' ],
+      ["w", "drive %m.forwardBackward %n cm at %n % speed",      "drive", "forward", 10, 50 ],
+      ["w", "drive %m.forwardBackward at %n % speed",            "driveContiniously", "forward", 50 ],
+      ["w", "turn %n degrees to the %m.leftRight at %n % speed", "turn", 90, "left", 30 ],
+      ["w", "turn %m.leftRight at %n % speed",                   "turnContiniously", "left", 30 ],
+      ["w", "set left motor %m.forwardBackward %n % speed right motor %m.forwardBackward %n % speed",
+                                                                 "setMotors", "forward", 50, "forward", 50 ],
+      ["w", "stop motors",                                       "stopMotors" ],
 
-      ['w', 'set %m.servos to %n degrees',                       'setServo', 'Servo 1', '90' ],
+      ["w", "set %m.servos to %n degrees",                       "setServo", "Servo 1", "90" ],
 
-      ['R', 'distance',                                          'getDistance' ]
+      ["R", "distance",                                          "getDistance" ]
     ],
     menus: {
-      blinkers:        [ 'both blinkers', 'left blinker', 'right blinker' ],
-      onOff:           [ 'on', 'off' ],
-      eyes:            [ 'both eyes', 'left eye', 'right eye' ],
-      forwardBackward: [ 'forward', 'backward' ],
-      leftRight:       [ 'left', 'right'],
-      servos:          [ 'Servo 1', 'Servo 2' ]
+      blinkers:        [ "both blinkers", "left blinker", "right blinker" ],
+      onOff:           [ "on", "off" ],
+      eyes:            [ "both eyes", "left eye", "right eye" ],
+      forwardBackward: [ "forward", "backward" ],
+      leftRight:       [ "left", "right"],
+      servos:          [ "Servo 1", "Servo 2" ]
     },
-    url: 'https://github.com/markokimpel/gopigoscratchextension'
+    url: "http://{{host_port}}/"
   };
 
   // Register the extension
-  ScratchExtensions.register('GoPiGo3', descriptor, ext);
+  ScratchExtensions.register("GoPiGo3", descriptor, ext);
 
 })({});

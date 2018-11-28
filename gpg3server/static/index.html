@@ -68,12 +68,51 @@
 
   <h3>Scratch 2 Offline Editor</h3>
   <p>
-    Use the <cite>Scratch 2</cite> application that is pre-installed on Raspbian.
+    Use the <cite>Scratch 2</cite> application that is pre-installed with Raspbian.
     No Internet connection is required.
   </p>
   <p>
+    There are two ways to load the extension:
+    <ul>
+      <li>Option A: (recommended) <cite>Register the extension with the editor</cite>. The extension can then be used like a built-in extension. The installation helper expects Scratch Offline Editor and GoPiGo3 Server to be running on the same computer.</li>
+      <li>Option B: <cite>Load the extension dynamically</cite> through a secret key combination and type the URL every time.</li>
+    </ul>
+  </p>
+
+  <h4>Option A: Register the extension with the editor</h4>
+  <p>
+    Execute the following command to register the extension. This needs to be done only once.
+    <pre>
+    pi@student-robot:~ $ sudo ~/gopigoscratchextension/scratch2offline/install_extension.sh
+    Reading /usr/lib/scratch2/scratch_extensions/extensions.json
+    Adding existing extension 'Pi GPIO'
+    Adding existing extension 'Pi SenseHAT'
+    Adding new extension 'GoPiGo3'
+    Creating backup /usr/lib/scratch2/scratch_extensions/extensions.json.backup_2018-11-28_21-37-12
+    Writing /usr/lib/scratch2/scratch_extensions/extensions.json
+    Writing /usr/lib/scratch2/scratch_extensions/gopigo3Extension.js
+    Writing /usr/lib/scratch2/medialibrarythumbnails/gopigo3.png
+    pi@student-robot:~ $</pre>
+  </p>
+  <p>
+    Whenever you want to work with Scratch:
     <ul>
       <li>The GoPiGo3 Server needs to be running.</li>
+      <li>Open the <cite>Scratch 2</cite> application.</li>
+      <li>In <cite>Scripts</cite>, group <cite>More Blocks</cite> hit button <cite>Add an Extension</cite>.</li>
+      <li>Select <cite>GoPiGo3</cite>.</li>
+      <li>In <cite>Scripts</cite>, group <cite>More Blocks</cite> you will find the new blocks.</li>
+    </ul>
+  </p>
+  <p>
+    When you load or save projects the file extension <cite>sb2</cite> will be used. The extension is loaded automatically when you open a project that used the extension.
+  </p>
+  
+  <h4>Option B: Load the extension dynamically</h4>
+  <p>
+    <ul>
+      <li>The GoPiGo3 Server needs to be running.</li>
+      <li>Open the <cite>Scratch 2</cite> application.</li>
       <li>Press <cite>Shift</cite> key and click <cite>File</cite> menu at the same time.</li>
       <li>Select <cite>Import experimental extension</cite> .</li>
       <li>Enter <code>http://{{host_port}}/scratch_extension.js</code>. <cite>Load</cite>.</li>
